@@ -39,7 +39,7 @@ circuit run --target hosted-engine --wallet EVM --amount 150
 
 # Unwind to USDC on Base, then stop.
 circuit run --target hosted-engine --wallet EVM --setting position=close
-circuit stop --target hosted-engine --wallet EVM
+circuit stop --target hosted --wallet EVM
 ```
 
 Wait for the close to finish before stopping. Stopping first leaves the Aave deposit, the loan and the short open.

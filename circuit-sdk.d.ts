@@ -15,8 +15,9 @@ declare module "circuit:sdk" {
     unrealizedPnlUsd: string | null;
     pricedAt: string | null;
     kind: "token";
+    availableQuantity: string;
   } | {
-    collateralToken: number;
+    collateralAsset: string;
     collateralSymbol: string;
     liquidationPrice: string | null;
     marginMode: "cross" | "isolated";
@@ -31,9 +32,10 @@ declare module "circuit:sdk" {
     unrealizedPnlUsd: string | null;
     pricedAt: string | null;
     kind: "perp";
-    network: "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
+    network: "derive" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
     asset: string;
     marginUsedInCollateralHolding: string;
+    positionId: string | null;
   } | {
     conditionId: string | null;
     tokenId: string | null;
@@ -55,6 +57,44 @@ declare module "circuit:sdk" {
     isRedeemable: boolean | null;
     outcome: string | null;
     question: string | null;
+  } | {
+    network: string;
+    asset: string;
+    tokenId: string | null;
+    symbol: string | null;
+    quantity: string;
+    priceUsd: string | null;
+    entryPriceUsd: string | null;
+    valueUsd: string | null;
+    unrealizedPnlUsd: string | null;
+    pricedAt: string | null;
+    protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+    market: string;
+    underlying: string | null;
+    underlyingQuantity: string | null;
+    apy: string | null;
+    kind: "supplied";
+    securesLoans: boolean;
+  } | {
+    network: string;
+    asset: string;
+    tokenId: string | null;
+    symbol: string | null;
+    quantity: string;
+    priceUsd: string | null;
+    entryPriceUsd: string | null;
+    valueUsd: string | null;
+    unrealizedPnlUsd: string | null;
+    pricedAt: string | null;
+    protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+    market: string;
+    underlying: string | null;
+    underlyingQuantity: string | null;
+    apy: string | null;
+    kind: "borrowed";
+    loanToValue: string | null;
+    liquidationLoanToValue: string | null;
+    healthFactor: string | null;
   };
   type Trigger = {
     kind: "schedule";
@@ -80,11 +120,6 @@ declare module "circuit:sdk" {
     source: string;
     url: string | null;
     emittedAt: string;
-  } | {
-    kind: "feed";
-    feed: string;
-    id: string;
-    payload: unknown;
   } | {
     kind: "balanceChange";
     network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "solana";
@@ -116,6 +151,19 @@ declare module "circuit:sdk" {
       } | null;
     } | {
       venue: "lighter" | "lighterRobinhood";
+      asset: string;
+      after: {
+        side: "long" | "short";
+        size: string;
+        entryPrice: string | null;
+      } | null;
+      before: {
+        side: "long" | "short";
+        size: string;
+        entryPrice: string | null;
+      } | null;
+    } | {
+      venue: "derive";
       asset: string;
       after: {
         side: "long" | "short";
@@ -181,8 +229,9 @@ declare module "circuit:sdk" {
       unrealizedPnlUsd: string | null;
       pricedAt: string | null;
       kind: "token";
+      availableQuantity: string;
     } | {
-      collateralToken: number;
+      collateralAsset: string;
       collateralSymbol: string;
       liquidationPrice: string | null;
       marginMode: "cross" | "isolated";
@@ -197,9 +246,10 @@ declare module "circuit:sdk" {
       unrealizedPnlUsd: string | null;
       pricedAt: string | null;
       kind: "perp";
-      network: "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
+      network: "derive" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
       asset: string;
       marginUsedInCollateralHolding: string;
+      positionId: string | null;
     } | {
       conditionId: string | null;
       tokenId: string | null;
@@ -221,11 +271,125 @@ declare module "circuit:sdk" {
       isRedeemable: boolean | null;
       outcome: string | null;
       question: string | null;
+    } | {
+      network: string;
+      asset: string;
+      tokenId: string | null;
+      symbol: string | null;
+      quantity: string;
+      priceUsd: string | null;
+      entryPriceUsd: string | null;
+      valueUsd: string | null;
+      unrealizedPnlUsd: string | null;
+      pricedAt: string | null;
+      protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+      market: string;
+      underlying: string | null;
+      underlyingQuantity: string | null;
+      apy: string | null;
+      kind: "supplied";
+      securesLoans: boolean;
+    } | {
+      network: string;
+      asset: string;
+      tokenId: string | null;
+      symbol: string | null;
+      quantity: string;
+      priceUsd: string | null;
+      entryPriceUsd: string | null;
+      valueUsd: string | null;
+      unrealizedPnlUsd: string | null;
+      pricedAt: string | null;
+      protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+      market: string;
+      underlying: string | null;
+      underlyingQuantity: string | null;
+      apy: string | null;
+      kind: "borrowed";
+      loanToValue: string | null;
+      liquidationLoanToValue: string | null;
+      healthFactor: string | null;
     })[];
   };
   export const isEvmNetwork: (value: string | null | undefined) => value is "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
   export const isSolanaNetwork: (network: string) => network is "solana";
-  type NetworkId = "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+  type NetworkId = "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+  type PolymarketDiscoverRail = "economy" | "endingSoon" | "geopolitics" | "mostAtStake" | "mostTalkedAbout" | "politics" | "popCulture" | "sports" | "tooCloseToCall" | "trending" | "volume";
+  type PolymarketResolvedEvent = {
+    imageUrl?: string | null | undefined;
+    openInterestPusd?: number | null | undefined;
+    markets: {
+      negRisk: boolean;
+      line: number | null;
+      outcomes: {
+        name: string;
+        asset: string;
+        pricePusd: string;
+      }[];
+      imageUrl?: string | null | undefined;
+      dayChangePercent: number | null;
+      endDate: string | null;
+      gameStartTime: string | null;
+      groupItemTitle: string | null;
+      liquidityPusd: number;
+      question: string;
+      slug: string;
+      sportsMarketType: string | null;
+      updatedAt: string | null;
+      volume24hPusd: number;
+    }[];
+    slug: string;
+    title: string;
+  };
+  type PolymarketSearchEventsData = {
+    startDate: string | null;
+    slug: string;
+    title: string;
+  }[];
+  type PolymarketMarketLookup = {
+    negRisk: boolean;
+    line: number | null;
+    outcomes: {
+      name: string;
+      asset: string;
+      pricePusd: string;
+    }[];
+    imageUrl?: string | null | undefined;
+    dayChangePercent: number | null;
+    acceptingOrders: boolean;
+    resolving: boolean;
+    description: string | null;
+    endDate: string | null;
+    eventTitle: string | null;
+    gameStartTime: string | null;
+    groupItemTitle: string | null;
+    liquidityPusd: number;
+    minimumNotional: string | null;
+    minimumSize: string | null;
+    priceTick: string | null;
+    question: string;
+    slug: string;
+    sportsMarketType: string | null;
+    updatedAt: string | null;
+    volume24hPusd: number;
+  };
+  type PolymarketPricePoint = {
+    timestamp: string;
+    pricePusd: string;
+  };
+  type PolymarketRedeemRequest = {
+    asset: string;
+  };
+  type PolymarketRedeemPositionsData = {
+    redeemed: {
+      asset: string;
+      conditionId: string | null;
+      formattedShares: string;
+      outcome: string | null;
+      question: string | null;
+      shares: string;
+    }[];
+  };
   type SolanaMoneyAction = {
     hexTransaction: `0x${string}`;
   } | {
@@ -252,17 +416,88 @@ declare module "circuit:sdk" {
     valueWei: string;
     data: `0x${string}`;
   };
-  type MoneyActionKind = "evmTx" | "hyperliquidAccount" | "hyperliquidAccountSetup" | "hyperliquidCancel" | "hyperliquidOrder" | "krakenCancelOrder" | "krakenPlaceOrder" | "lighterAccountSetup" | "lighterCancel" | "lighterMargin" | "lighterOrder" | "lighterRobinhoodAccountSetup" | "lighterRobinhoodCancel" | "lighterRobinhoodMargin" | "lighterRobinhoodOrder" | "papertradeAccountSetup" | "papertradeClaim" | "papertradeClose" | "papertradeOpen" | "papertradeStake" | "papertradeUnstake" | "polymarketCancel" | "polymarketDepositWalletCreate" | "polymarketOrder" | "polymarketPositionChange" | "polymarketRedeem" | "solanaTx" | "swap" | "transfer";
-  type AdmittedMoneyAction = {
+  type PolymarketOrderProposal = {
+    kind: "spotBuy";
+    asset: string;
+    amount: {
+      value: string;
+    };
+    execution?: {
+      kind: "market";
+    } | null | undefined;
+  } | {
+    kind: "spotBuy";
+    asset: string;
+    amount: {
+      size: string;
+    };
+    execution: {
+      kind: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      expiresAt?: string | null | undefined;
+    };
+  } | {
+    kind: "spotSell";
+    asset: string;
+    amount: {
+      size: string;
+    };
+    execution?: {
+      kind: "market";
+    } | null | undefined;
+  } | {
+    kind: "spotSell";
+    asset: string;
+    amount: {
+      size: string;
+    };
+    execution: {
+      kind: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      expiresAt?: string | null | undefined;
+    };
+  };
+  type MoneyActionKind = "binanceCancelOrder" | "binancePlaceOrder" | "bybitCancelOrder" | "bybitPlaceOrder" | "coinbaseCancelOrder" | "coinbasePlaceOrder" | "deriveAccountSetup" | "deriveCancel" | "deriveOrder" | "deriveVault" | "evmTx" | "hyperliquidAccount" | "hyperliquidAccountSetup" | "hyperliquidCancel" | "hyperliquidOrder" | "krakenCancelOrder" | "krakenPlaceOrder" | "krakenWithdraw" | "lighterAccountSetup" | "lighterCancel" | "lighterMargin" | "lighterOrder" | "lighterRobinhoodAccountSetup" | "lighterRobinhoodCancel" | "lighterRobinhoodMargin" | "lighterRobinhoodOrder" | "okxCancelOrder" | "okxPlaceOrder" | "papertradeAccountSetup" | "papertradeClaim" | "papertradeClose" | "papertradeOpen" | "papertradeStake" | "papertradeUnstake" | "polymarketCancel" | "polymarketDepositWalletCreate" | "polymarketOrder" | "polymarketPositionChange" | "polymarketRedeem" | "solanaTx" | "swap" | "transfer";
+  type ExecutableMoneyAction = {
+    kind: "swap";
+    swap: {
+      from: {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      } | {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      };
+      to: {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+        walletAddress: string;
+      } | {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+        walletAddress: string;
+      };
+      slippage: string;
+      engines?: ("across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
+      confidential?: boolean | null | undefined;
+      amountRaw: string;
+      quoteFloor?: {
+        receiveRaw: string;
+        sellRaw: string;
+      } | null | undefined;
+    };
+  } | {
     kind: "transfer";
     transfer: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
       asset: string;
       toAddress: string;
       amountRaw: string;
       decimals?: number | undefined;
     } | {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
       asset: string;
       toAddress: string;
       amountRaw: string;
@@ -272,23 +507,23 @@ declare module "circuit:sdk" {
     kind: "polymarketOrder";
     order: {
       asset: string;
-      side: "BUY";
-      spendPusd: string;
+      side: "buy";
+      value: string;
     } | {
       asset: string;
-      side: "SELL";
-      shares: string;
+      side: "sell";
+      size: string;
     } | {
       asset: string;
-      side: "BUY" | "SELL";
-      shares: string;
-      limitPricePusd: string;
+      side: "buy" | "sell";
+      size: string;
+      price: string;
       timeInForce: "ioc";
     } | {
       asset: string;
-      side: "BUY" | "SELL";
-      shares: string;
-      limitPricePusd: string;
+      side: "buy" | "sell";
+      size: string;
+      price: string;
       timeInForce: "alo" | "gtc";
       expiresAt?: string | null | undefined;
     };
@@ -316,55 +551,6 @@ declare module "circuit:sdk" {
       assets: string[];
       shares: string;
     };
-  } | {
-    kind: "hyperliquidOrder";
-    order: {
-      type: "limit";
-      side: "buy" | "sell";
-      timeInForce: "alo" | "gtc" | "ioc";
-      message?: string | undefined;
-      asset: string;
-      reduceOnly: boolean;
-      takeProfit?: {
-        triggerPrice: string;
-        price?: string | undefined;
-      } | undefined;
-      stopLoss?: {
-        triggerPrice: string;
-        price?: string | undefined;
-      } | undefined;
-      price: string;
-      size: string;
-    } | {
-      type: "limit";
-      side: "buy" | "sell";
-      timeInForce: "alo" | "gtc" | "ioc";
-      message?: string | undefined;
-      asset: string;
-      reduceOnly: false;
-      price: string;
-      size: string;
-    } | {
-      side: "buy" | "sell";
-      message?: string | undefined;
-      asset: string;
-      reduceOnly: boolean;
-      triggerPrice: string;
-      type: "stopLoss" | "takeProfit";
-      size: string;
-    } | {
-      side: "buy" | "sell";
-      message?: string | undefined;
-      asset: string;
-      reduceOnly: boolean;
-      triggerPrice: string;
-      type: "stopLossLimit" | "takeProfitLimit";
-      price: string;
-      size: string;
-    };
-  } | {
-    kind: "hyperliquidCancel";
-    orderId: string;
   } | {
     kind: "hyperliquidAccountSetup";
   } | {
@@ -398,6 +584,22 @@ declare module "circuit:sdk" {
       at: string | null;
     };
   } | {
+    kind: "deriveAccountSetup";
+  } | {
+    kind: "deriveVault";
+    vault: {
+      kind: "deposit";
+      vault: number;
+      amount: string;
+    } | {
+      kind: "withdraw";
+      vault: number;
+      shares: string;
+    } | {
+      kind: "cancel";
+      vault: number;
+    };
+  } | {
     kind: "papertradeOpen";
     order: {
       asset: string;
@@ -424,21 +626,24 @@ declare module "circuit:sdk" {
     order: {
       asset: string;
       side: "buy" | "sell";
-      volume: string;
+      size: string;
+      reduceOnly: false;
       price: string;
       type: "limit";
       timeInForce: "alo" | "gtc" | "ioc";
-      expiresAt?: string | undefined;
+      expiresAt?: string | null | undefined;
     } | {
       asset: string;
       side: "buy" | "sell";
-      volume: string;
+      size: string;
+      reduceOnly: false;
       triggerPrice: string;
       type: "stopLoss" | "takeProfit";
     } | {
       asset: string;
       side: "buy" | "sell";
-      volume: string;
+      size: string;
+      reduceOnly: false;
       triggerPrice: string;
       price: string;
       type: "stopLossLimit" | "takeProfitLimit";
@@ -446,6 +651,15 @@ declare module "circuit:sdk" {
   } | {
     kind: "krakenCancelOrder";
     orderId: string;
+  } | {
+    kind: "krakenWithdraw";
+    withdrawal: {
+      asset: string;
+      key: string;
+      address: string;
+      amount: string;
+      maxFee: string;
+    };
   } | {
     kind: "evmTx";
     evm: {
@@ -475,6 +689,156 @@ declare module "circuit:sdk" {
           value: string;
         })[];
       }[];
+    };
+  } | {
+    kind: "binanceCancelOrder";
+    orderId: string;
+    asset: string;
+  } | {
+    kind: "binancePlaceOrder";
+    order: {
+      asset: string;
+      side: "buy" | "sell";
+      reduceOnly: false;
+      type: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      size: string;
+    };
+  } | {
+    kind: "bybitCancelOrder";
+    orderId: string;
+    asset: string;
+  } | {
+    kind: "bybitPlaceOrder";
+    order: {
+      asset: string;
+      side: "buy" | "sell";
+      reduceOnly: false;
+      type: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      size: string;
+    };
+  } | {
+    kind: "coinbaseCancelOrder";
+    orderId: string;
+    asset: string;
+  } | {
+    kind: "coinbasePlaceOrder";
+    order: {
+      asset: string;
+      side: "buy" | "sell";
+      reduceOnly: false;
+      type: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      size: string;
+    };
+  } | {
+    kind: "deriveCancel";
+    orderId: string;
+  } | {
+    kind: "deriveOrder";
+    order: {
+      type: "limit";
+      side: "buy" | "sell";
+      timeInForce: "alo" | "gtc" | "ioc";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      price: string;
+      size: string;
+    } | {
+      type: "limit";
+      side: "buy" | "sell";
+      timeInForce: "alo" | "gtc" | "ioc";
+      message?: string | undefined;
+      reduceOnly: boolean;
+      asset: string;
+      price: string;
+      size: string;
+    } | {
+      type: "limit";
+      side: "buy" | "sell";
+      timeInForce: "alo" | "gtc" | "ioc";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: false;
+      price: string;
+      size: string;
+    } | {
+      side: "buy" | "sell";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      triggerPrice: string;
+      type: "stopLoss" | "takeProfit";
+      size: string;
+    } | {
+      side: "buy" | "sell";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      triggerPrice: string;
+      type: "stopLossLimit" | "takeProfitLimit";
+      price: string;
+      size: string;
+    };
+  } | {
+    kind: "hyperliquidCancel";
+    orderId: string;
+  } | {
+    kind: "hyperliquidOrder";
+    order: {
+      type: "limit";
+      side: "buy" | "sell";
+      timeInForce: "alo" | "gtc" | "ioc";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      takeProfit?: {
+        triggerPrice: string;
+        price?: string | undefined;
+      } | undefined;
+      stopLoss?: {
+        triggerPrice: string;
+        price?: string | undefined;
+      } | undefined;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
+      price: string;
+      size: string;
+    } | {
+      type: "limit";
+      side: "buy" | "sell";
+      timeInForce: "alo" | "gtc" | "ioc";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: false;
+      price: string;
+      size: string;
+    } | {
+      side: "buy" | "sell";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
+      triggerPrice: string;
+      type: "stopLoss" | "takeProfit";
+      size: string;
+    } | {
+      side: "buy" | "sell";
+      message?: string | undefined;
+      asset: string;
+      reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
+      triggerPrice: string;
+      type: "stopLossLimit" | "takeProfitLimit";
+      price: string;
+      size: string;
     };
   } | {
     kind: "lighterAccountSetup";
@@ -515,6 +879,8 @@ declare module "circuit:sdk" {
         triggerPrice: string;
         price?: string | undefined;
       } | undefined;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       price: string;
       size: string;
     } | {
@@ -531,6 +897,8 @@ declare module "circuit:sdk" {
       message?: string | undefined;
       asset: string;
       reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       triggerPrice: string;
       type: "stopLoss" | "takeProfit";
       size: string;
@@ -539,6 +907,8 @@ declare module "circuit:sdk" {
       message?: string | undefined;
       asset: string;
       reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       triggerPrice: string;
       type: "stopLossLimit" | "takeProfitLimit";
       price: string;
@@ -583,6 +953,8 @@ declare module "circuit:sdk" {
         triggerPrice: string;
         price?: string | undefined;
       } | undefined;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       price: string;
       size: string;
     } | {
@@ -599,6 +971,8 @@ declare module "circuit:sdk" {
       message?: string | undefined;
       asset: string;
       reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       triggerPrice: string;
       type: "stopLoss" | "takeProfit";
       size: string;
@@ -607,46 +981,60 @@ declare module "circuit:sdk" {
       message?: string | undefined;
       asset: string;
       reduceOnly: boolean;
+      leverage?: number | undefined;
+      marginMode?: "cross" | "isolated" | undefined;
       triggerPrice: string;
       type: "stopLossLimit" | "takeProfitLimit";
       price: string;
       size: string;
     };
   } | {
-    kind: "swap";
-    swap: {
-      from: {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-        asset: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-        asset: string;
-      };
-      to: {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-        asset: string;
-        walletAddress: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-        asset: string;
-        walletAddress: string;
-      };
-      engines?: ("across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
-      confidential?: boolean | null | undefined;
-      amountRaw: string;
-      quoteFloor?: {
-        receiveRaw: string;
-        sellRaw: string;
-      } | null | undefined;
-      slippage: string;
+    kind: "okxCancelOrder";
+    orderId: string;
+    asset: string;
+  } | {
+    kind: "okxPlaceOrder";
+    order: {
+      asset: string;
+      side: "buy" | "sell";
+      reduceOnly: false;
+      type: "limit";
+      timeInForce: "alo" | "gtc" | "ioc";
+      price: string;
+      size: string;
+    };
+  };
+  type SwapRequest = {
+    from: {
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      asset: string;
+    } | {
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      asset: string;
+    };
+    to: {
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      asset: string;
+    } | {
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      asset: string;
+    } | {
+      stock: string;
+    };
+    minimumReceive?: string | null | undefined;
+    slippage?: string | null | undefined;
+    engines?: ("across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
+    confidential?: boolean | null | undefined;
+    amount: string | {
+      balancePercent: string;
     };
   };
   type TransferRequest = {
     from: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
       asset: string;
     } | {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
       asset: string;
     };
     to: {
@@ -657,11 +1045,6 @@ declare module "circuit:sdk" {
     };
   };
   type AgentHyperliquidAccountRequest = {
-    kind: "leverage";
-    asset: string;
-    leverage: number;
-    marginMode: "cross" | "isolated";
-  } | {
     kind: "isolatedMargin";
     asset: string;
     change: "add" | "remove";
@@ -681,8 +1064,9 @@ declare module "circuit:sdk" {
     change: "deposit" | "withdraw";
     amountUsdc: string;
   };
-  type PapertradeCloseRequest = {
-    positionIds: string[];
+  type Once = {
+    once: string;
+    per?: "day" | "hour" | "week" | undefined;
   };
   type ApiErrorDetails = {
     success: false;
@@ -704,7 +1088,7 @@ declare module "circuit:sdk" {
       stage: "preparation";
       operationId: null;
     } | {
-      stage: "admission" | "execution";
+      stage: "execution";
       operationId: string;
     } | undefined;
     receipts?: {
@@ -725,17 +1109,16 @@ declare module "circuit:sdk" {
     readonly requestId: string | undefined;
     readonly statusCode: number | undefined;
     readonly httpErrorStatus: number | undefined;
-    constructor(message: string, options: Partial<Pick<ApiError, "requestId" | "statusCode" | "code" | "details" | "cause">>);
+    readonly target: string | undefined;
+    constructor(message: string, options: Partial<Pick<ApiError, "requestId" | "statusCode" | "code" | "details" | "cause" | "target">>);
   }
   type TransferQuoteResponse = {
-    type: "evm" | "hypercore" | "lighter" | "lighter-robinhood" | "solana";
+    type: "derive" | "evm" | "hypercore" | "lighter" | "lighter-robinhood" | "solana";
     amount: string;
     fee: string;
     feeSymbol: string;
     minimumAmount?: string | undefined;
     gasBalanceWarning?: string | undefined;
-    isValidTransaction: boolean;
-    errorMessage?: string | null | undefined;
   };
   type WalletTransactionRequest = {
     network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
@@ -813,7 +1196,7 @@ declare module "circuit:sdk" {
     s: string;
   };
   type OperationResource = {
-    status: "error" | "pending" | "success";
+    status: "error" | "pending" | "success" | "unproven";
     operationId: string;
     readError?: string | undefined;
     kind: string;
@@ -847,6 +1230,80 @@ declare module "circuit:sdk" {
     network: string;
   };
   type ActionResult = {
+    binanceCancelOrder: {
+      orderId: string;
+      state: "canceled" | "filled";
+    };
+    binancePlaceOrder: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
+    bybitCancelOrder: {
+      orderId: string;
+      state: "canceled" | "filled";
+    };
+    bybitPlaceOrder: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
+    coinbaseCancelOrder: {
+      orderId: string;
+      state: "canceled" | "filled";
+    };
+    coinbasePlaceOrder: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
+    deriveAccountSetup: null;
+    deriveCancel: {
+      orderId: string;
+      state: "canceled" | "filled";
+    };
+    deriveOrder: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
+    deriveVault: null;
     evmTx: null;
     hyperliquidAccount: null;
     hyperliquidAccountSetup: null;
@@ -870,13 +1327,25 @@ declare module "circuit:sdk" {
     };
     krakenCancelOrder: {
       orderId: string;
-      count: number;
+      state: "canceled" | "filled";
     };
     krakenPlaceOrder: {
-      orderIds: string[];
+      side: "buy" | "sell";
+      filled: string;
       averageFillPrice?: string | null | undefined;
-      clientOrderId: string | null;
-      description: string | null;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
+    krakenWithdraw: {
+      referenceId: string;
+      transactionId: string | null;
     };
     lighterAccountSetup: null;
     lighterCancel: {
@@ -918,31 +1387,55 @@ declare module "circuit:sdk" {
       orderId: string;
       size: string;
     };
+    okxCancelOrder: {
+      orderId: string;
+      state: "canceled" | "filled";
+    };
+    okxPlaceOrder: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
+    };
     papertradeAccountSetup: null;
     papertradeClaim: {
       claimed: string;
     };
     papertradeClose: {
-      positions: {
-        positionId: string;
-        asset: string;
-        side: "long" | "short";
-        exitPrice: string;
-        pnl: string;
-        paperMinted: string;
-        liquidated: boolean;
-      }[];
-    };
-    papertradeOpen: {
-      positionId: string;
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
       asset: string;
-      side: "long" | "short";
+      limitPrice: string;
+      orderId: string;
       size: string;
-      margin: string;
-      leverage: number;
-      entryPrice: string;
-      liquidationPrice: string;
-      openedAt: string;
+    }[];
+    papertradeOpen: {
+      side: "buy" | "sell";
+      filled: string;
+      averageFillPrice?: string | null | undefined;
+      state: "canceled" | "filled" | "open" | "partiallyFilled";
+      venueStatus: string;
+      type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+      triggerPrice: string | null;
+      reduceOnly: boolean;
+      asset: string;
+      limitPrice: string;
+      orderId: string;
+      size: string;
     };
     papertradeStake: null;
     papertradeUnstake: null;
@@ -954,13 +1447,6 @@ declare module "circuit:sdk" {
       wallet: string;
     };
     polymarketOrder: {
-      orderId: string;
-      side: "BUY" | "SELL";
-      averageFillPrice?: string | null | undefined;
-      collateralAmountPusd: string;
-      pricePusd: string;
-      shares: string;
-    } | {
       side: "buy" | "sell";
       filled: string;
       averageFillPrice?: string | null | undefined;
@@ -986,7 +1472,9 @@ declare module "circuit:sdk" {
       }[];
     };
     solanaTx: null;
-    swap: null;
+    swap: {
+      received: string;
+    };
     transfer: null;
   };
   type CompletedOperation<Kind extends MoneyActionKind = MoneyActionKind> = { [Action in Kind]: Omit<OperationResource, "kind" | "result" | "status"> & {
@@ -994,36 +1482,18 @@ declare module "circuit:sdk" {
     kind: Action;
     result: ActionResult[Action];
   }; }[Kind];
-  type SwapProviderId = "across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
+  type SwapProviderId = "across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
+  export const MINIMUM_SWAP_USD = "1";
   export function decimalCompare(left: string, right: string): number;
   export const decimalAdd: (left: string, right: string) => string;
   export const decimalSub: (left: string, right: string) => string;
   export function decimalMultiply(left: string, right: string): string;
   export const decimalDivide: (numerator: string, denominator: string, scale: number) => string;
   export const decimalDivideCeil: (numerator: string, denominator: string, scale: number) => string;
+  export const decimalAlign: (value: string, increment: string, ceil?: boolean) => string;
   export const decimalIsZero: (value: string) => boolean;
   export const decimalMax: (a: string, b: string) => string;
   export const decimalMin: (a: string, b: string) => string;
-  type KrakenCancelOrderResult = {
-    orderId: string;
-    count: number;
-  };
-  type KrakenOrder = {
-    orderId: string;
-    clientOrderId: string | null;
-    asset: string;
-    side: "buy" | "sell";
-    type: string;
-    status: string;
-    closedAt: string | null;
-    cost: string | null;
-    fee: string | null;
-    filled: string;
-    openedAt: string | null;
-    price: string | null;
-    triggerPrice: string | null;
-    volume: string;
-  };
   type KrakenOrderBookData = {
     asset: string;
     asks: {
@@ -1048,444 +1518,12 @@ declare module "circuit:sdk" {
     nativeId: string;
     status: "cancel_only" | "delisted" | "limit_only" | "maintenance" | "online" | "post_only" | "reduce_only" | "work_in_progress";
     asset: string;
-    orderMinimum: string;
+    minimumSize: string;
+    minimumNotional: string;
     base: string;
-    costMinimum: string;
-    priceIncrement: string;
+    priceTick: string;
     quote: string;
-    volumeIncrement: string;
-  };
-  type PolymarketDiscoverRail = "economy" | "endingSoon" | "geopolitics" | "mostAtStake" | "mostTalkedAbout" | "politics" | "popCulture" | "sports" | "tooCloseToCall" | "trending" | "volume";
-  type PolymarketResolvedEvent = {
-    imageUrl?: string | null | undefined;
-    openInterestPusd?: number | null | undefined;
-    markets: {
-      negRisk: boolean;
-      line: number | null;
-      outcomes: {
-        name: string;
-        asset: string;
-        pricePusd: string;
-      }[];
-      imageUrl?: string | null | undefined;
-      dayChangePercent: number | null;
-      endDate: string | null;
-      gameStartTime: string | null;
-      groupItemTitle: string | null;
-      liquidityPusd: number;
-      question: string;
-      slug: string;
-      sportsMarketType: string | null;
-      updatedAt: string | null;
-      volume24hPusd: number;
-    }[];
-    slug: string;
-    title: string;
-  };
-  type PolymarketSearchEventsData = {
-    startDate: string | null;
-    slug: string;
-    title: string;
-  }[];
-  type PolymarketMarketLookup = {
-    negRisk: boolean;
-    line: number | null;
-    outcomes: {
-      name: string;
-      asset: string;
-      pricePusd: string;
-    }[];
-    imageUrl?: string | null | undefined;
-    dayChangePercent: number | null;
-    description: string | null;
-    endDate: string | null;
-    eventTitle: string | null;
-    gameStartTime: string | null;
-    groupItemTitle: string | null;
-    liquidityPusd: number;
-    question: string;
-    slug: string;
-    sportsMarketType: string | null;
-    updatedAt: string | null;
-    volume24hPusd: number;
-  };
-  type PolymarketPricePoint = {
-    timestamp: string;
-    pricePusd: string;
-  };
-  type PolymarketOrderRequest = {
-    asset: string;
-    side: "BUY";
-    spendPusd: string;
-  } | {
-    asset: string;
-    side: "SELL";
-    shares: string;
-  } | {
-    asset: string;
-    side: "BUY" | "SELL";
-    shares: string;
-    limitPricePusd: string;
-    timeInForce: "ioc";
-  } | {
-    asset: string;
-    side: "BUY" | "SELL";
-    shares: string;
-    limitPricePusd: string;
-    timeInForce: "alo" | "gtc";
-    expiresAt?: string | null | undefined;
-  };
-  type PolymarketRedeemRequest = {
-    asset: string;
-  };
-  type PolymarketRedeemPositionsData = {
-    redeemed: {
-      asset: string;
-      conditionId: string | null;
-      formattedShares: string;
-      outcome: string | null;
-      question: string | null;
-      shares: string;
-    }[];
-  };
-  type PolymarketMarketOrderData = {
-    orderId: string;
-    side: "BUY" | "SELL";
-    averageFillPrice?: string | null | undefined;
-    collateralAmountPusd: string;
-    pricePusd: string;
-    shares: string;
-  };
-  type DataCommandName = "asset_fundamentals" | "asset_prices" | "assets" | "candles" | "categories" | "funding_rates" | "markets" | "marks" | "mids" | "open_interest" | "pools" | "revenue" | "yields";
-  type PagedCommandName = "asset_fundamentals" | "asset_prices" | "assets" | "candles" | "categories" | "funding_rates" | "open_interest" | "revenue" | "yields";
-  type RowsByCommand = {
-    asset_fundamentals: {
-      denominationAsset: string;
-      denominationSymbol: string;
-      day: string;
-      firstObservedAt: string;
-      asset: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      vendorKey: string;
-      circulatingSupply: string | null;
-      fullyDilutedValuation: string | null;
-      marketCap: string | null;
-      maxSupply: string | null;
-      price: string | null;
-      totalSupply: string | null;
-      volume: string | null;
-    } | {
-      denominationAsset: string;
-      denominationSymbol: string;
-      asset: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      symbol: string;
-      observedDayCount: number;
-      vendorKey: string;
-      circulatingSupply: string | null;
-      fullyDilutedValuation: string | null;
-      marketCap: string | null;
-      maxSupply: string | null;
-      price: string | null;
-      totalSupply: string | null;
-      volume: string | null;
-    };
-    asset_prices: {
-      denominationAsset: string;
-      denominationSymbol: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      vendorKey: string;
-      asset: string;
-      observedAt: string;
-      sweep: "census" | "refresh";
-      marketCap: string | null;
-      price: string | null;
-    };
-    assets: {
-      id: string;
-      symbol: string;
-      name: string;
-      assetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault";
-      underlyingAsset: string | null;
-      venueIdentifiers: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-        dex: string;
-        venueSymbol: string;
-        quoteAsset: string;
-        quoteSymbol: string;
-        maximumLeverage: number | null;
-        orderSizeDecimals: number | null;
-        delistedAt: string | null;
-      }[];
-      vendorIdentifiers: {
-        vendor: "coingecko" | "coingecko-rwa" | "defillama";
-        vendorKey: string;
-      }[];
-      categoryKeys: string[];
-      contracts: ({
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      })[];
-    };
-    candles: {
-      venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-      dex: string;
-      venueSymbol: string;
-      grain: "15m" | "1d" | "1h" | "1m" | "4h" | "5m";
-      timestampOpen: string;
-      tradeCount: number | null;
-      collectedFrom: "api" | "archive" | null;
-      close: string;
-      high: string;
-      low: string;
-      open: string;
-      volumeBase: string;
-    };
-    categories: {
-      denominationAsset: string;
-      denominationSymbol: string;
-      day: string;
-      firstObservedAt: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      categoryKey: string;
-      name: string;
-      marketCap: string | null;
-      volume: string | null;
-    };
-    funding_rates: {
-      venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-      dex: string;
-      venueSymbol: string;
-      settlesAt: string;
-      fundingRate: string;
-    };
-    markets: {
-      venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-      dex: string;
-      venueSymbol: string;
-      assetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault";
-      underlyingAsset: string | null;
-      underlyingAssetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault" | null;
-      maximumLeverage: number | null;
-      orderSizeDecimals: number | null;
-      fundingRate: string | null;
-      settlesAt: string | null;
-      observedDayCount: number | null;
-      cumulativeFundingRate: string | null;
-      fundingSettlementCount: number | null;
-      baseSymbol: string;
-      dayAgoPrice: string | null;
-      medianDailyVolumeQuote: string | null;
-      medianDailyVolumeUsd: string | null;
-      openInterestBase: string | null;
-      openInterestQuote: string | null;
-      openInterestUsd: string | null;
-      price: string | null;
-      priceUsd: string | null;
-      quoteSymbol: string;
-      volumeQuote: string | null;
-      volumeUsd: string | null;
-    };
-    marks: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-      address: string;
-      tokenId: string | null;
-      priceUsd: string;
-      pricedAt: string;
-    };
-    mids: {
-      venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-      dex: string;
-      venueSymbol: string;
-      timestamp: string;
-      price: string;
-    };
-    open_interest: {
-      venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-      dex: string;
-      venueSymbol: string;
-      timestamp: string;
-      openInterestBase: string | null;
-    };
-    pools: {
-      vendor: "defillama" | "onchain";
-      pool: string;
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-      protocol: string;
-      factory: {
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      } | null;
-      label: string;
-      createdAt: string | null;
-      firstObservedAt: string;
-      depositToken: {
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      } | null;
-      hooks: string | null;
-      baseToken: {
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      } | null;
-      baseAsset: string | null;
-      baseSymbol: string | null;
-      quoteToken: {
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      } | null;
-      quoteRole: "dollar" | "native" | null;
-      quoteAsset: string | null;
-      quoteSymbol: string | null;
-      lastPrice: string | null;
-      lastTradeMinute: string | null;
-      constituents: {
-        address: string;
-        symbol: string | null;
-        asset: string | null;
-        inflow: string | null;
-        outflow: string | null;
-        reserve: string | null;
-      }[];
-      baseReserve: string | null;
-      buyCount: number;
-      fee: number | null;
-      liquidityChangeInWindow: string | null;
-      liquidityUsd: string | null;
-      priceChangeInWindow: string | null;
-      quoteReserve: string | null;
-      sellCount: number;
-      tickSpacing: number | null;
-      tradeCount: number;
-      volumeBase: string | null;
-      volumeQuote: string | null;
-      volumeUsd: string | null;
-    };
-    revenue: {
-      denominationAsset: string;
-      denominationSymbol: string;
-      day: string;
-      firstObservedAt: string;
-      asset: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      contributingProtocols: string[];
-      fees: string | null;
-      holders: string | null;
-      total: string | null;
-    } | {
-      denominationAsset: string;
-      denominationSymbol: string;
-      asset: string;
-      vendor: "coingecko" | "coingecko-rwa" | "defillama";
-      symbol: string;
-      observedDayCount: number;
-      fees: string | null;
-      holders: string | null;
-      total: string | null;
-    };
-    yields: {
-      vendor: "defillama";
-      pool: string;
-      yieldKind: "advertised" | "measured";
-      protocol: string;
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-      label: string;
-      depositToken: {
-        network: string;
-        address: string;
-        error: string;
-      } | {
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        address: string;
-      } | {
-        network: "solana";
-        address: string;
-      } | {
-        network: "hypercore";
-        address: string;
-      } | null;
-      depositAsset: string | null;
-      constituents: {
-        address: string;
-        symbol: string | null;
-        decimals: number | null;
-        asset: string | null;
-      }[];
-      day: string;
-      firstObservedAt: string;
-      apyIncludingRewards: string | null;
-      denominationAddress: string | null;
-      denominationAsset: string | null;
-      withdrawalOutcome: "delayed" | "error_rpc" | "no_exit_primary" | "ok_full" | "ok_partial" | "reverted_liquidity" | "reverted_paused" | "reverted_unknown" | null;
-      withdrawalEtaMs: number | null;
-      measurementConfidence: "high" | "low" | "medium" | null;
-      apyExcludingRewards: string | null;
-      impermanentLossRisk: boolean;
-      singleAssetExposure: boolean;
-      stablecoinOnly: boolean;
-      totalValueLockedUsd: string | null;
-      withdrawableAmount: string | null;
-      withdrawalSlippagePercent: string | null;
-    };
-  };
-  type DataPage<V extends DataCommandName> = {
-    rows: readonly RowsByCommand[V][];
-  } & (V extends PagedCommandName ? {
-    nextCursor: string | null;
-  } : unknown);
-  type MoneyOperationOptions = {
-    idempotencyKey?: string;
-    onAdmitted?: (operation: OperationResource) => Promise<void>;
+    sizeStep: string;
   };
   interface AgentSettings extends Record<never, never> {}
   type AgentContext = {
@@ -1504,8 +1542,9 @@ declare module "circuit:sdk" {
         unrealizedPnlUsd: string | null;
         pricedAt: string | null;
         kind: "token";
+        availableQuantity: string;
       } | {
-        collateralToken: number;
+        collateralAsset: string;
         collateralSymbol: string;
         liquidationPrice: string | null;
         marginMode: "cross" | "isolated";
@@ -1520,9 +1559,10 @@ declare module "circuit:sdk" {
         unrealizedPnlUsd: string | null;
         pricedAt: string | null;
         kind: "perp";
-        network: "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
+        network: "derive" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade";
         asset: string;
         marginUsedInCollateralHolding: string;
+        positionId: string | null;
       } | {
         conditionId: string | null;
         tokenId: string | null;
@@ -1544,6 +1584,44 @@ declare module "circuit:sdk" {
         isRedeemable: boolean | null;
         outcome: string | null;
         question: string | null;
+      } | {
+        network: string;
+        asset: string;
+        tokenId: string | null;
+        symbol: string | null;
+        quantity: string;
+        priceUsd: string | null;
+        entryPriceUsd: string | null;
+        valueUsd: string | null;
+        unrealizedPnlUsd: string | null;
+        pricedAt: string | null;
+        protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+        market: string;
+        underlying: string | null;
+        underlyingQuantity: string | null;
+        apy: string | null;
+        kind: "supplied";
+        securesLoans: boolean;
+      } | {
+        network: string;
+        asset: string;
+        tokenId: string | null;
+        symbol: string | null;
+        quantity: string;
+        priceUsd: string | null;
+        entryPriceUsd: string | null;
+        valueUsd: string | null;
+        unrealizedPnlUsd: string | null;
+        pricedAt: string | null;
+        protocol: "aave" | "aave-v4" | "euler" | "kamino" | "lido" | "morpho" | "spark" | null;
+        market: string;
+        underlying: string | null;
+        underlyingQuantity: string | null;
+        apy: string | null;
+        kind: "borrowed";
+        loanToValue: string | null;
+        liquidationLoanToValue: string | null;
+        healthFactor: string | null;
       })[];
     };
     readonly next: (options?: {
@@ -1575,11 +1653,6 @@ declare module "circuit:sdk" {
       url: string | null;
       emittedAt: string;
     } | {
-      kind: "feed";
-      feed: string;
-      id: string;
-      payload: unknown;
-    } | {
       kind: "balanceChange";
       network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "solana";
       wallet: string;
@@ -1597,6 +1670,19 @@ declare module "circuit:sdk" {
       wallet: string;
       changes: ({
         venue: "lighter" | "lighterRobinhood";
+        asset: string;
+        after: {
+          side: "long" | "short";
+          size: string;
+          entryPrice: string | null;
+        } | null;
+        before: {
+          side: "long" | "short";
+          size: string;
+          entryPrice: string | null;
+        } | null;
+      } | {
+        venue: "derive";
         asset: string;
         after: {
           side: "long" | "short";
@@ -1663,126 +1749,6 @@ declare module "circuit:sdk" {
       orderId?: string | undefined;
     };
     readonly log: (message: string, options?: AgentLogOptions) => Promise<void>;
-    readonly operations: {
-      readonly retrieve: {
-        (params: {
-          /** format "uuid" */
-          operationId: string;
-        }): Promise<{
-          status: "error" | "pending" | "success";
-          operationId: string;
-          readError?: string | undefined;
-          kind: string;
-          request: unknown;
-          receipts: {
-            observationIndex: number | null;
-            position: string | null;
-            network: string;
-            referenceKind: string;
-            referenceValue: string;
-          }[];
-          createdAt: string;
-          action: AdmittedMoneyAction | null;
-          deadlineAt: string | null;
-          error: unknown;
-          finishedAt: string | null;
-          result: unknown;
-        }>;
-        (params: {
-          idempotencyKey: string;
-        }): Promise<{
-          status: "error" | "pending" | "success";
-          operationId: string;
-          readError?: string | undefined;
-          kind: string;
-          request: unknown;
-          receipts: {
-            observationIndex: number | null;
-            position: string | null;
-            network: string;
-            referenceKind: string;
-            referenceValue: string;
-          }[];
-          createdAt: string;
-          action: AdmittedMoneyAction | null;
-          deadlineAt: string | null;
-          error: unknown;
-          finishedAt: string | null;
-          result: unknown;
-        } | null>;
-      };
-      readonly cancel: (params: {
-        /** format "uuid" */
-        operationId: string;
-      }) => Promise<{
-        status: "error" | "pending" | "success";
-        operationId: string;
-        readError?: string | undefined;
-        kind: string;
-        request: unknown;
-        receipts: {
-          observationIndex: number | null;
-          position: string | null;
-          network: string;
-          referenceKind: string;
-          referenceValue: string;
-        }[];
-        createdAt: string;
-        deadlineAt: string | null;
-        error: unknown;
-        finishedAt: string | null;
-        result: unknown;
-      }>;
-      readonly list: (params?: {
-        cursor?: string | undefined;
-        pendingOnly?: boolean | undefined;
-      } | undefined) => Promise<{
-        nextCursor: string | null;
-        rows: {
-          status: "error" | "pending" | "success";
-          operationId: string;
-          readError?: string | undefined;
-          kind: string;
-          request: unknown;
-          receipts: {
-            observationIndex: number | null;
-            position: string | null;
-            network: string;
-            referenceKind: string;
-            referenceValue: string;
-          }[];
-          createdAt: string;
-          action: AdmittedMoneyAction | null;
-          deadlineAt: string | null;
-          error: unknown;
-          finishedAt: string | null;
-          result: unknown;
-          sessionId: number | null;
-          walletId: number | null;
-        }[];
-      }> & AsyncIterable<{
-        status: "error" | "pending" | "success";
-        operationId: string;
-        readError?: string | undefined;
-        kind: string;
-        request: unknown;
-        receipts: {
-          observationIndex: number | null;
-          position: string | null;
-          network: string;
-          referenceKind: string;
-          referenceValue: string;
-        }[];
-        createdAt: string;
-        action: AdmittedMoneyAction | null;
-        deadlineAt: string | null;
-        error: unknown;
-        finishedAt: string | null;
-        result: unknown;
-        sessionId: number | null;
-        walletId: number | null;
-      }>;
-    };
     readonly wallet: {
       readonly transactions: {
         readonly preview: (params: WalletTransactionRequest) => Promise<{
@@ -1824,7 +1790,7 @@ declare module "circuit:sdk" {
               })[];
             }[];
           };
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"evmTx" | "solanaTx">>;
+        }, options?: Once) => Promise<CompletedOperation<"evmTx" | "solanaTx">>;
       };
       readonly messages: {
         readonly sign: (params: {
@@ -1863,19 +1829,17 @@ declare module "circuit:sdk" {
       };
     };
     readonly transfers: {
-      readonly quote: ({ from, to, amount }: TransferQuote) => Promise<{
-        type: "evm" | "hypercore" | "lighter" | "lighter-robinhood" | "solana";
+      readonly quote: (transfer: TransferRequest) => Promise<{
+        type: "derive" | "evm" | "hypercore" | "lighter" | "lighter-robinhood" | "solana";
         amount: string;
         fee: string;
         feeSymbol: string;
         minimumAmount?: string | undefined;
         gasBalanceWarning?: string | undefined;
-        isValidTransaction: boolean;
-        errorMessage?: string | null | undefined;
       }>;
       readonly create: (params: {
         from: {
-          network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+          network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
           asset: string;
         };
         to: {
@@ -1884,8 +1848,8 @@ declare module "circuit:sdk" {
         amount: string | {
           balancePercent: string;
         };
-      }, options?: MoneyOperationOptions) => Promise<Omit<{
-        status: "error" | "pending" | "success";
+      }, options?: Once) => Promise<Omit<{
+        status: "error" | "pending" | "success" | "unproven";
         operationId: string;
         readError?: string | undefined;
         kind: string;
@@ -1909,12 +1873,12 @@ declare module "circuit:sdk" {
       }>;
     };
     readonly swaps: {
-      readonly quote: (params: SwapParams) => Promise<{
+      readonly quote: (swap: SwapRequest) => Promise<{
         gasBalanceWarning?: string | undefined;
-        engine: "across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
+        engine: "across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
         venuePriceImpact?: string | undefined;
         candidates?: {
-          engine: "across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
+          engine: "across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth";
           amount: string;
           amountUsd?: string | undefined;
           selected: boolean;
@@ -1953,24 +1917,24 @@ declare module "circuit:sdk" {
       }>;
       readonly create: (params: {
         from: {
-          network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+          network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
           asset: string;
         };
         to: {
-          network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+          network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
           asset: string;
         } | {
           stock: string;
         };
         minimumReceive?: string | null | undefined;
         slippage?: string | null | undefined;
-        engines?: ("across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
+        engines?: ("across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
         confidential?: boolean | null | undefined;
         amount: string | {
           balancePercent: string;
         };
-      }, options?: MoneyOperationOptions) => Promise<Omit<{
-        status: "error" | "pending" | "success";
+      }, options?: Once) => Promise<Omit<{
+        status: "error" | "pending" | "success" | "unproven";
         operationId: string;
         readError?: string | undefined;
         kind: string;
@@ -1990,7 +1954,9 @@ declare module "circuit:sdk" {
       }, "kind" | "result" | "status"> & {
         status: "success";
         kind: "swap";
-        result: null;
+        result: {
+          received: string;
+        };
       }>;
     };
     readonly hyperliquid: {
@@ -2000,7 +1966,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2016,7 +1982,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2032,12 +1998,14 @@ declare module "circuit:sdk" {
         create: (params: {
           kind: "perpOpen";
           message?: string | null | undefined;
+          leverage?: number | null | undefined;
+          marginMode?: "cross" | "isolated" | null | undefined;
           asset: string;
           side: "long" | "short";
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2068,7 +2036,7 @@ declare module "circuit:sdk" {
           asset: string;
           expectedSide?: "long" | "short" | null | undefined;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2094,7 +2062,7 @@ declare module "circuit:sdk" {
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2109,7 +2077,7 @@ declare module "circuit:sdk" {
           message?: string | null | undefined;
           asset: string;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2121,8 +2089,8 @@ declare module "circuit:sdk" {
             price: string;
             timeInForce: "alo" | "gtc" | "ioc";
           } | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2157,10 +2125,11 @@ declare module "circuit:sdk" {
             size: string;
           };
         }>;
-        cancel: (params: {
-          orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        cancel: (params: Omit<{
+          kind: "hyperliquidCancel";
+          orderId: unknown;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2187,8 +2156,8 @@ declare module "circuit:sdk" {
         }>;
       };
       readonly account: {
-        readonly update: (params: AgentHyperliquidAccountRequest, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        readonly update: (params: AgentHyperliquidAccountRequest, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2240,7 +2209,6 @@ declare module "circuit:sdk" {
       readonly spotMarkets: {
         readonly list: () => Promise<{
           asset: string;
-          orderSizeDecimals: number;
           baseSymbol: string;
           baseToken: number;
           quoteSymbol: string;
@@ -2255,7 +2223,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2271,7 +2239,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2287,12 +2255,14 @@ declare module "circuit:sdk" {
         create: (params: {
           kind: "perpOpen";
           message?: string | null | undefined;
+          leverage?: number | null | undefined;
+          marginMode?: "cross" | "isolated" | null | undefined;
           asset: string;
           side: "long" | "short";
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2323,7 +2293,7 @@ declare module "circuit:sdk" {
           asset: string;
           expectedSide?: "long" | "short" | null | undefined;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2349,7 +2319,7 @@ declare module "circuit:sdk" {
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2364,7 +2334,7 @@ declare module "circuit:sdk" {
           message?: string | null | undefined;
           asset: string;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2376,18 +2346,11 @@ declare module "circuit:sdk" {
             price: string;
             timeInForce: "alo" | "gtc" | "ioc";
           } | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
-        cancel: (params: {
-          orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
+        cancel: (params: Omit<AgentRequest<"lighterCancel" | "lighterRobinhoodCancel">, "kind">, options?: Once) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
       };
       margin: {
         update: (params: {
-          kind: "leverage";
-          asset: string;
-          leverage: number;
-          marginMode: "cross" | "isolated";
-        } | {
           kind: "isolatedMargin";
           asset: string;
           change: "add" | "remove";
@@ -2396,7 +2359,7 @@ declare module "circuit:sdk" {
           kind: "routeTransfer";
           to: "perps" | "spot";
           amountUsdc: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
       };
     } | {
       orders: {
@@ -2405,7 +2368,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2421,7 +2384,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2437,12 +2400,14 @@ declare module "circuit:sdk" {
         create: (params: {
           kind: "perpOpen";
           message?: string | null | undefined;
+          leverage?: number | null | undefined;
+          marginMode?: "cross" | "isolated" | null | undefined;
           asset: string;
           side: "long" | "short";
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2473,7 +2438,7 @@ declare module "circuit:sdk" {
           asset: string;
           expectedSide?: "long" | "short" | null | undefined;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2499,7 +2464,7 @@ declare module "circuit:sdk" {
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2514,7 +2479,7 @@ declare module "circuit:sdk" {
           message?: string | null | undefined;
           asset: string;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2526,18 +2491,11 @@ declare module "circuit:sdk" {
             price: string;
             timeInForce: "alo" | "gtc" | "ioc";
           } | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
-        cancel: (params: {
-          orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
+        cancel: (params: Omit<AgentRequest<"lighterCancel" | "lighterRobinhoodCancel">, "kind">, options?: Once) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
       };
       margin: {
         update: (params: {
-          kind: "leverage";
-          asset: string;
-          leverage: number;
-          marginMode: "cross" | "isolated";
-        } | {
           kind: "isolatedMargin";
           asset: string;
           change: "add" | "remove";
@@ -2546,7 +2504,7 @@ declare module "circuit:sdk" {
           kind: "routeTransfer";
           to: "perps" | "spot";
           amountUsdc: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
       };
     };
     readonly lighterRobinhood: {
@@ -2556,7 +2514,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2572,7 +2530,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2588,12 +2546,14 @@ declare module "circuit:sdk" {
         create: (params: {
           kind: "perpOpen";
           message?: string | null | undefined;
+          leverage?: number | null | undefined;
+          marginMode?: "cross" | "isolated" | null | undefined;
           asset: string;
           side: "long" | "short";
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2624,7 +2584,7 @@ declare module "circuit:sdk" {
           asset: string;
           expectedSide?: "long" | "short" | null | undefined;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2650,7 +2610,7 @@ declare module "circuit:sdk" {
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2665,7 +2625,7 @@ declare module "circuit:sdk" {
           message?: string | null | undefined;
           asset: string;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2677,18 +2637,11 @@ declare module "circuit:sdk" {
             price: string;
             timeInForce: "alo" | "gtc" | "ioc";
           } | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
-        cancel: (params: {
-          orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
+        cancel: (params: Omit<AgentRequest<"lighterCancel" | "lighterRobinhoodCancel">, "kind">, options?: Once) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
       };
       margin: {
         update: (params: {
-          kind: "leverage";
-          asset: string;
-          leverage: number;
-          marginMode: "cross" | "isolated";
-        } | {
           kind: "isolatedMargin";
           asset: string;
           change: "add" | "remove";
@@ -2697,7 +2650,7 @@ declare module "circuit:sdk" {
           kind: "routeTransfer";
           to: "perps" | "spot";
           amountUsdc: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
       };
     } | {
       orders: {
@@ -2706,7 +2659,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2722,7 +2675,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -2738,12 +2691,14 @@ declare module "circuit:sdk" {
         create: (params: {
           kind: "perpOpen";
           message?: string | null | undefined;
+          leverage?: number | null | undefined;
+          marginMode?: "cross" | "isolated" | null | undefined;
           asset: string;
           side: "long" | "short";
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2774,7 +2729,7 @@ declare module "circuit:sdk" {
           asset: string;
           expectedSide?: "long" | "short" | null | undefined;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2800,7 +2755,7 @@ declare module "circuit:sdk" {
           amount: {
             size: string;
           } | {
-            valueUsdc: string;
+            value: string;
           };
           execution?: {
             kind: "market";
@@ -2815,7 +2770,7 @@ declare module "circuit:sdk" {
           message?: string | null | undefined;
           asset: string;
           amount: {
-            valueUsdc: string;
+            value: string;
           } | {
             size: string;
           };
@@ -2827,18 +2782,11 @@ declare module "circuit:sdk" {
             price: string;
             timeInForce: "alo" | "gtc" | "ioc";
           } | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
-        cancel: (params: {
-          orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterOrder" | "lighterRobinhoodOrder">>;
+        cancel: (params: Omit<AgentRequest<"lighterCancel" | "lighterRobinhoodCancel">, "kind">, options?: Once) => Promise<CompletedOperation<"lighterCancel" | "lighterRobinhoodCancel">>;
       };
       margin: {
         update: (params: {
-          kind: "leverage";
-          asset: string;
-          leverage: number;
-          marginMode: "cross" | "isolated";
-        } | {
           kind: "isolatedMargin";
           asset: string;
           change: "add" | "remove";
@@ -2847,7 +2795,296 @@ declare module "circuit:sdk" {
           kind: "routeTransfer";
           to: "perps" | "spot";
           amountUsdc: string;
-        }, options?: MoneyOperationOptions) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
+        }, options?: Once) => Promise<CompletedOperation<"lighterMargin" | "lighterRobinhoodMargin">>;
+      };
+    };
+    readonly derive: {
+      readonly orders: {
+        readonly listOpen: () => Promise<({
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
+      } & {
+        create: (params: {
+          kind: "perpReduce";
+          message?: string | null | undefined;
+          asset: string;
+          expectedSide?: "long" | "short" | null | undefined;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | {
+            kind: "stopLoss" | "takeProfit";
+            triggerPrice: string;
+          } | {
+            kind: "stopLossLimit" | "takeProfitLimit";
+            triggerPrice: string;
+            price: string;
+          } | null | undefined;
+        } | {
+          kind: "spotBuy";
+          message?: string | null | undefined;
+          asset: string;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "spotSell";
+          message?: string | null | undefined;
+          asset: string;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "optionBuy";
+          message?: string | null | undefined;
+          asset: string;
+          amount: {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+          reduceOnly?: boolean | null | undefined;
+        } | {
+          kind: "optionSell";
+          message?: string | null | undefined;
+          asset: string;
+          amount: {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+          reduceOnly?: boolean | null | undefined;
+        } | {
+          kind: "perpOpen";
+          message?: string | null | undefined;
+          asset: string;
+          side: "long" | "short";
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | {
+            kind: "stopLoss" | "takeProfit";
+            triggerPrice: string;
+          } | {
+            kind: "stopLossLimit" | "takeProfitLimit";
+            triggerPrice: string;
+            price: string;
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "deriveOrder";
+          result: {
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          };
+        }>;
+        cancel: (params: Omit<{
+          kind: "deriveCancel";
+          orderId: unknown;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "deriveCancel";
+          result: {
+            orderId: string;
+            state: "canceled" | "filled";
+          };
+        }>;
+      };
+      readonly vaults: {
+        readonly request: (params: {
+          kind: "deposit";
+          vault: number;
+          amount: string;
+        } | {
+          kind: "withdraw";
+          vault: number;
+          shares: string;
+        } | {
+          kind: "cancel";
+          vault: number;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "deriveVault";
+          result: null;
+        }>;
+        readonly list: () => Promise<{
+          vault: number;
+          name: string;
+          description: string | null;
+          depositAsset: string;
+          closed: boolean;
+          navUsd: string;
+          sharePriceUsd: string;
+        }[]>;
+      };
+      readonly options: {
+        readonly list: (params: {
+          currency: string;
+          /** format "date". One expiry, YYYY-MM-DD, to quote with mark, book and greeks */
+          expiry?: string | undefined;
+        }) => Promise<{
+          asset: string;
+          expiresAt: string;
+          strike: string;
+          optionType: "call" | "put";
+          quote: {
+            ask: string | null;
+            bid: string | null;
+            delta: string | null;
+            gamma: string | null;
+            impliedVolatility: string | null;
+            mark: string | null;
+            theta: string | null;
+            vega: string | null;
+          } | null;
+          minimumSize: string;
+          priceTick: string;
+          sizeStep: string;
+        }[]>;
       };
     };
     readonly papertrade: {
@@ -2877,11 +3114,13 @@ declare module "circuit:sdk" {
         readonly open: (params: {
           asset: string;
           side: "long" | "short";
-          margin: string;
+          amount: {
+            value: string;
+          };
           leverage: number;
           fundFrom?: "balance" | "queued" | null | undefined;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2902,21 +3141,24 @@ declare module "circuit:sdk" {
           status: "success";
           kind: "papertradeOpen";
           result: {
-            positionId: string;
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
             asset: string;
-            side: "long" | "short";
+            limitPrice: string;
+            orderId: string;
             size: string;
-            margin: string;
-            leverage: number;
-            entryPrice: string;
-            liquidationPrice: string;
-            openedAt: string;
           };
         }>;
         readonly close: (params: {
           positionIds: string[];
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2937,18 +3179,23 @@ declare module "circuit:sdk" {
           status: "success";
           kind: "papertradeClose";
           result: {
-            positions: {
-              positionId: string;
-              asset: string;
-              side: "long" | "short";
-              exitPrice: string;
-              pnl: string;
-              paperMinted: string;
-              liquidated: boolean;
-            }[];
-          };
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          }[];
         }>;
-        readonly closed: (params: PapertradeCloseRequest) => Promise<{
+        readonly closed: (params: {
+          positionIds: string[];
+        }) => Promise<{
           positionId: string;
           asset: string;
           side: "long" | "short";
@@ -2961,8 +3208,8 @@ declare module "circuit:sdk" {
       readonly paper: {
         readonly stake: (params: {
           amount: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -2986,8 +3233,8 @@ declare module "circuit:sdk" {
         }>;
         readonly unstake: (params: {
           amount: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3009,8 +3256,8 @@ declare module "circuit:sdk" {
           kind: "papertradeUnstake";
           result: null;
         }>;
-        readonly claim: (options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        readonly claim: (params?: Record<string, never>, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3085,7 +3332,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -3101,7 +3348,7 @@ declare module "circuit:sdk" {
           filled: string;
           averageFillPrice?: string | null | undefined;
           reduceOnly: boolean;
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood" | "polymarket";
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
           operationId: string;
           placedAt: string;
           entryOperationId: string | null;
@@ -3114,62 +3361,101 @@ declare module "circuit:sdk" {
           size: string;
         })[]>;
         readonly quote: (params: {
+          kind: "spotBuy";
           asset: string;
-          side: "BUY";
-          /** maxLength 80. Fill-or-kill market BUY: the maximum pUSD to spend, including Polymarket fees. */
-          spendPusd: string;
+          /** Total order notional in the market's quote asset (USDC; USDG on Lighter Robinhood; pUSD on Polymarket; USD on KRAKEN:XBT/USD), never margin or a USD conversion. | Outcome shares, at most 2 decimals. */
+          amount: {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+          } | null | undefined;
         } | {
+          kind: "spotBuy";
           asset: string;
-          side: "SELL";
-          /** maxLength 80. Fill-or-kill market SELL: the outcome shares to sell, rounded down to venue precision. | maxLength 80. Outcome shares to buy or sell at limitPricePusd or better: at most 2 decimals, and at least the market's minimum order size when the order rests. */
-          shares: string;
+          /** Total order notional in the market's quote asset (USDC; USDG on Lighter Robinhood; pUSD on Polymarket; USD on KRAKEN:XBT/USD), never margin or a USD conversion. | Outcome shares, at most 2 decimals. */
+          amount: {
+            size: string;
+          };
+          execution: {
+            kind: "limit";
+            timeInForce: "alo" | "gtc" | "ioc";
+            price: string;
+            expiresAt?: string | null | undefined;
+          };
         } | {
+          kind: "spotSell";
           asset: string;
-          side: "BUY" | "SELL";
-          /** maxLength 80. Fill-or-kill market SELL: the outcome shares to sell, rounded down to venue precision. | maxLength 80. Outcome shares to buy or sell at limitPricePusd or better: at most 2 decimals, and at least the market's minimum order size when the order rests. */
-          shares: string;
-          /** maxLength 80. pUSD per share, aligned to the market's tick size. */
-          limitPricePusd: string;
-          timeInForce: "ioc";
+          /** Total order notional in the market's quote asset (USDC; USDG on Lighter Robinhood; pUSD on Polymarket; USD on KRAKEN:XBT/USD), never margin or a USD conversion. | Outcome shares, at most 2 decimals. */
+          amount: {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+          } | null | undefined;
         } | {
+          kind: "spotSell";
           asset: string;
-          side: "BUY" | "SELL";
-          /** maxLength 80. Fill-or-kill market SELL: the outcome shares to sell, rounded down to venue precision. | maxLength 80. Outcome shares to buy or sell at limitPricePusd or better: at most 2 decimals, and at least the market's minimum order size when the order rests. */
-          shares: string;
-          /** maxLength 80. pUSD per share, aligned to the market's tick size. */
-          limitPricePusd: string;
-          timeInForce: "alo" | "gtc";
-          /** format "date-time" */
-          expiresAt?: string | null | undefined;
+          /** Total order notional in the market's quote asset (USDC; USDG on Lighter Robinhood; pUSD on Polymarket; USD on KRAKEN:XBT/USD), never margin or a USD conversion. | Outcome shares, at most 2 decimals. */
+          amount: {
+            size: string;
+          };
+          execution: {
+            kind: "limit";
+            timeInForce: "alo" | "gtc" | "ioc";
+            price: string;
+            expiresAt?: string | null | undefined;
+          };
         }) => Promise<{
           expectedPusdAmount: string;
           price: string;
           signedSharesChange: string;
-        }>;
+        } | null>;
       } & {
         create: (params: {
+          kind: "spotBuy";
           asset: string;
-          side: "BUY";
-          spendPusd: string;
+          amount: {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+          } | null | undefined;
         } | {
+          kind: "spotBuy";
           asset: string;
-          side: "BUY" | "SELL";
-          shares: string;
-          limitPricePusd: string;
-          timeInForce: "ioc";
+          amount: {
+            size: string;
+          };
+          execution: {
+            kind: "limit";
+            timeInForce: "alo" | "gtc" | "ioc";
+            price: string;
+            expiresAt?: string | null | undefined;
+          };
         } | {
+          kind: "spotSell";
           asset: string;
-          side: "BUY" | "SELL";
-          shares: string;
-          limitPricePusd: string;
-          timeInForce: "alo" | "gtc";
-          expiresAt?: string | null | undefined;
+          amount: {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+          } | null | undefined;
         } | {
+          kind: "spotSell";
           asset: string;
-          side: "SELL";
-          shares: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+          amount: {
+            size: string;
+          };
+          execution: {
+            kind: "limit";
+            timeInForce: "alo" | "gtc" | "ioc";
+            price: string;
+            expiresAt?: string | null | undefined;
+          };
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3190,13 +3476,6 @@ declare module "circuit:sdk" {
           status: "success";
           kind: "polymarketOrder";
           result: {
-            orderId: string;
-            side: "BUY" | "SELL";
-            averageFillPrice?: string | null | undefined;
-            collateralAmountPusd: string;
-            pricePusd: string;
-            shares: string;
-          } | {
             side: "buy" | "sell";
             filled: string;
             averageFillPrice?: string | null | undefined;
@@ -3211,10 +3490,11 @@ declare module "circuit:sdk" {
             size: string;
           };
         }>;
-        cancel: (params: {
+        cancel: (params: Omit<{
+          kind: "polymarketCancel";
           orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3243,8 +3523,8 @@ declare module "circuit:sdk" {
       readonly positions: {
         readonly redeem: (params: {
           asset: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3287,8 +3567,8 @@ declare module "circuit:sdk" {
           kind: "convert";
           assets: string[];
           shares: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3391,12 +3671,17 @@ declare module "circuit:sdk" {
           }[];
           imageUrl?: string | null | undefined;
           dayChangePercent: number | null;
+          acceptingOrders: boolean;
+          resolving: boolean;
           description: string | null;
           endDate: string | null;
           eventTitle: string | null;
           gameStartTime: string | null;
           groupItemTitle: string | null;
           liquidityPusd: number;
+          minimumNotional: string | null;
+          minimumSize: string | null;
+          priceTick: string | null;
           question: string;
           slug: string;
           sportsMarketType: string | null;
@@ -3465,16 +3750,21 @@ declare module "circuit:sdk" {
         }[]>;
       };
       readonly markets: {
-        readonly list: () => Promise<{
+        readonly list: (params?: {
+          /** Asset in any spelling, e.g. "BTC", "XBT", "XXBT" or "KRAKEN:XBT"; rows name assets by Circuit id ("KRAKEN:XBT"), never a ticker */
+          base?: string | undefined;
+          /** Asset in any spelling, e.g. "BTC", "XBT", "XXBT" or "KRAKEN:XBT"; rows name assets by Circuit id ("KRAKEN:XBT"), never a ticker */
+          quote?: string | undefined;
+        } | undefined) => Promise<{
           nativeId: string;
           status: "cancel_only" | "delisted" | "limit_only" | "maintenance" | "online" | "post_only" | "reduce_only" | "work_in_progress";
           asset: string;
-          orderMinimum: string;
+          minimumSize: string;
+          minimumNotional: string;
           base: string;
-          costMinimum: string;
-          priceIncrement: string;
+          priceTick: string;
           quote: string;
-          volumeIncrement: string;
+          sizeStep: string;
         }[]>;
       };
       readonly orderBooks: {
@@ -3497,43 +3787,39 @@ declare module "circuit:sdk" {
         }>;
       };
       readonly orders: {
-        readonly listOpen: (params?: {
-          asset?: string | undefined;
-        } | undefined) => Promise<{
-          orderId: string;
-          clientOrderId: string | null;
-          asset: string;
+        readonly listOpen: () => Promise<({
           side: "buy" | "sell";
-          type: string;
-          status: string;
-          closedAt: string | null;
-          cost: string | null;
-          fee: string | null;
           filled: string;
-          openedAt: string | null;
-          price: string | null;
-          triggerPrice: string | null;
-          volume: string;
-        }[]>;
-        readonly retrieve: (params: {
-          /** minLength 1 */
-          orderId: string;
-        }) => Promise<{
-          orderId: string;
-          clientOrderId: string | null;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
           asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
           side: "buy" | "sell";
-          type: string;
-          status: string;
-          closedAt: string | null;
-          cost: string | null;
-          fee: string | null;
           filled: string;
-          openedAt: string | null;
-          price: string | null;
-          triggerPrice: string | null;
-          volume: string;
-        }>;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
       };
       readonly tickers: {
         readonly retrieve: (params: {
@@ -3549,28 +3835,55 @@ declare module "circuit:sdk" {
     } & {
       orders: {
         create: (params: {
+          kind: "spotBuy";
           asset: string;
-          side: "buy" | "sell";
-          volume: string;
-          price: string;
-          type?: "limit" | undefined;
-          timeInForce?: "alo" | "gtc" | "ioc" | undefined;
-          expiresAt?: string | undefined;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "stopLoss" | "takeProfit";
+            triggerPrice: string;
+          } | {
+            kind: "stopLossLimit" | "takeProfitLimit";
+            triggerPrice: string;
+            price: string;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+            expiresAt?: string | null | undefined;
+          } | null | undefined;
         } | {
+          kind: "spotSell";
           asset: string;
-          side: "buy" | "sell";
-          volume: string;
-          triggerPrice: string;
-          type: "stopLoss" | "takeProfit";
-        } | {
-          asset: string;
-          side: "buy" | "sell";
-          volume: string;
-          triggerPrice: string;
-          price: string;
-          type: "stopLossLimit" | "takeProfitLimit";
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "stopLoss" | "takeProfit";
+            triggerPrice: string;
+          } | {
+            kind: "stopLossLimit" | "takeProfitLimit";
+            triggerPrice: string;
+            price: string;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+            expiresAt?: string | null | undefined;
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3591,16 +3904,25 @@ declare module "circuit:sdk" {
           status: "success";
           kind: "krakenPlaceOrder";
           result: {
-            orderIds: string[];
+            side: "buy" | "sell";
+            filled: string;
             averageFillPrice?: string | null | undefined;
-            clientOrderId: string | null;
-            description: string | null;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
           };
         }>;
-        cancel: (params: {
+        cancel: (params: Omit<{
+          kind: "krakenCancelOrder";
           orderId: string;
-        }, options?: MoneyOperationOptions) => Promise<Omit<{
-          status: "error" | "pending" | "success";
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
           operationId: string;
           readError?: string | undefined;
           kind: string;
@@ -3622,7 +3944,631 @@ declare module "circuit:sdk" {
           kind: "krakenCancelOrder";
           result: {
             orderId: string;
-            count: number;
+            state: "canceled" | "filled";
+          };
+        }>;
+      };
+    };
+    readonly coinbase: {
+      readonly markets: {
+        readonly list: (params?: {
+          /** Asset code, e.g. BTC */
+          base?: string | undefined;
+          /** Asset code, e.g. BTC */
+          quote?: string | undefined;
+        } | undefined) => Promise<{
+          asset: string;
+          nativeId: string;
+          tradable: boolean;
+          minimumSize: string;
+          minimumNotional: string;
+          base: string;
+          priceTick: string;
+          quote: string;
+          sizeStep: string;
+        }[]>;
+      };
+      readonly orders: {
+        readonly listOpen: () => Promise<({
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
+      };
+    } & {
+      orders: {
+        create: (params: {
+          kind: "spotBuy";
+          asset: string;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "spotSell";
+          asset: string;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "coinbasePlaceOrder";
+          result: {
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          };
+        }>;
+        cancel: (params: Omit<{
+          kind: "coinbaseCancelOrder";
+          orderId: string;
+          asset: string;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "coinbaseCancelOrder";
+          result: {
+            orderId: string;
+            state: "canceled" | "filled";
+          };
+        }>;
+      };
+    };
+    readonly okx: {
+      readonly markets: {
+        readonly list: (params?: {
+          /** Asset code, e.g. BTC */
+          base?: string | undefined;
+          /** Asset code, e.g. BTC */
+          quote?: string | undefined;
+        } | undefined) => Promise<{
+          asset: string;
+          nativeId: string;
+          tradable: boolean;
+          minimumSize: string;
+          minimumNotional: string;
+          base: string;
+          priceTick: string;
+          quote: string;
+          sizeStep: string;
+        }[]>;
+      };
+      readonly orders: {
+        readonly listOpen: () => Promise<({
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
+      };
+    } & {
+      orders: {
+        create: (params: {
+          kind: "spotBuy";
+          asset: string;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "spotSell";
+          asset: string;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "okxPlaceOrder";
+          result: {
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          };
+        }>;
+        cancel: (params: Omit<{
+          kind: "okxCancelOrder";
+          orderId: string;
+          asset: string;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "okxCancelOrder";
+          result: {
+            orderId: string;
+            state: "canceled" | "filled";
+          };
+        }>;
+      };
+    };
+    readonly binance: {
+      readonly markets: {
+        readonly list: (params?: {
+          /** Asset code, e.g. BTC */
+          base?: string | undefined;
+          /** Asset code, e.g. BTC */
+          quote?: string | undefined;
+        } | undefined) => Promise<{
+          asset: string;
+          nativeId: string;
+          tradable: boolean;
+          minimumSize: string;
+          minimumNotional: string;
+          base: string;
+          priceTick: string;
+          quote: string;
+          sizeStep: string;
+        }[]>;
+      };
+      readonly orders: {
+        readonly listOpen: () => Promise<({
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
+      };
+    } & {
+      orders: {
+        create: (params: {
+          kind: "spotBuy";
+          asset: string;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "spotSell";
+          asset: string;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "binancePlaceOrder";
+          result: {
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          };
+        }>;
+        cancel: (params: Omit<{
+          kind: "binanceCancelOrder";
+          orderId: string;
+          asset: string;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "binanceCancelOrder";
+          result: {
+            orderId: string;
+            state: "canceled" | "filled";
+          };
+        }>;
+      };
+    };
+    readonly bybit: {
+      readonly markets: {
+        readonly list: (params?: {
+          /** Asset code, e.g. BTC */
+          base?: string | undefined;
+          /** Asset code, e.g. BTC */
+          quote?: string | undefined;
+        } | undefined) => Promise<{
+          asset: string;
+          nativeId: string;
+          tradable: boolean;
+          minimumSize: string;
+          minimumNotional: string;
+          base: string;
+          priceTick: string;
+          quote: string;
+          sizeStep: string;
+        }[]>;
+      };
+      readonly orders: {
+        readonly listOpen: () => Promise<({
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "limit";
+          triggerPrice: null;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        } | {
+          side: "buy" | "sell";
+          filled: string;
+          averageFillPrice?: string | null | undefined;
+          reduceOnly: boolean;
+          venue: "binance" | "bybit" | "coinbase" | "derive" | "hyperliquid" | "kraken" | "lighter" | "lighterRobinhood" | "okx" | "polymarket";
+          operationId: string;
+          placedAt: string;
+          entryOperationId: string | null;
+          entryOrderId: string | null;
+          type: "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+          triggerPrice: string;
+          asset: string;
+          limitPrice: string;
+          orderId: string;
+          size: string;
+        })[]>;
+      };
+    } & {
+      orders: {
+        create: (params: {
+          kind: "spotBuy";
+          asset: string;
+          amount: {
+            size: string;
+          } | {
+            value: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        } | {
+          kind: "spotSell";
+          asset: string;
+          amount: {
+            value: string;
+          } | {
+            size: string;
+          };
+          execution?: {
+            kind: "market";
+            slippage?: string | null | undefined;
+          } | {
+            kind: "limit";
+            price: string;
+            timeInForce: "alo" | "gtc" | "ioc";
+          } | null | undefined;
+        }, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "bybitPlaceOrder";
+          result: {
+            side: "buy" | "sell";
+            filled: string;
+            averageFillPrice?: string | null | undefined;
+            state: "canceled" | "filled" | "open" | "partiallyFilled";
+            venueStatus: string;
+            type: "limit" | "stopLoss" | "stopLossLimit" | "takeProfit" | "takeProfitLimit";
+            triggerPrice: string | null;
+            reduceOnly: boolean;
+            asset: string;
+            limitPrice: string;
+            orderId: string;
+            size: string;
+          };
+        }>;
+        cancel: (params: Omit<{
+          kind: "bybitCancelOrder";
+          orderId: string;
+          asset: string;
+        }, "kind">, options?: Once) => Promise<Omit<{
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+        }, "kind" | "result" | "status"> & {
+          status: "success";
+          kind: "bybitCancelOrder";
+          result: {
+            orderId: string;
+            state: "canceled" | "filled";
           };
         }>;
       };
@@ -3661,7 +4607,40 @@ declare module "circuit:sdk" {
         /** minLength 1 */
         categoryKey?: string | undefined;
         sortBy?: undefined;
-      } | undefined) => Promise<DataPage<"asset_fundamentals">> & AsyncIterable<{
+      } | undefined) => Promise<{
+        rows: readonly ({
+          denominationAsset: string;
+          denominationSymbol: string;
+          day: string;
+          firstObservedAt: string;
+          asset: string;
+          vendor: "coingecko" | "coingecko-rwa" | "defillama";
+          vendorKey: string;
+          circulatingSupply: string | null;
+          fullyDilutedValuation: string | null;
+          marketCap: string | null;
+          maxSupply: string | null;
+          price: string | null;
+          totalSupply: string | null;
+          volume: string | null;
+        } | {
+          denominationAsset: string;
+          denominationSymbol: string;
+          asset: string;
+          vendor: "coingecko" | "coingecko-rwa" | "defillama";
+          symbol: string;
+          observedDayCount: number;
+          vendorKey: string;
+          circulatingSupply: string | null;
+          fullyDilutedValuation: string | null;
+          marketCap: string | null;
+          maxSupply: string | null;
+          price: string | null;
+          totalSupply: string | null;
+          volume: string | null;
+        })[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
         denominationAsset: string;
         denominationSymbol: string;
         day: string;
@@ -3692,49 +4671,13 @@ declare module "circuit:sdk" {
         totalSupply: string | null;
         volume: string | null;
       }>;
-      readonly assetPrices: (params?: {
-        /** integer, exclusiveMinimum 0 */
-        lookbackMs?: number | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-        /** minLength 1 */
-        cursor?: string | undefined;
-        vendor?: "coingecko" | "coingecko-rwa" | "defillama" | undefined;
-        assetType?: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault" | undefined;
-        /** minLength 1 */
-        categoryKey?: string | undefined;
-        /** minItems 1 */
-        asset: string[];
-      } | {
-        /** format "date-time" */
-        asOf?: string | undefined;
-        /** minLength 1 */
-        cursor?: string | undefined;
-        lookbackMs?: undefined;
-        /** minItems 1 */
-        asset?: string[] | undefined;
-        vendor?: "coingecko" | "coingecko-rwa" | "defillama" | undefined;
-        assetType?: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault" | undefined;
-        /** minLength 1 */
-        categoryKey?: string | undefined;
-      } | undefined) => Promise<DataPage<"asset_prices">> & AsyncIterable<{
-        denominationAsset: string;
-        denominationSymbol: string;
-        vendor: "coingecko" | "coingecko-rwa" | "defillama";
-        vendorKey: string;
-        asset: string;
-        observedAt: string;
-        sweep: "census" | "refresh";
-        marketCap: string | null;
-        price: string | null;
-      }>;
       readonly assets: (params?: {
-        venue?: "hyperliquid" | "lighter" | "lighterRobinhood" | undefined;
+        venue?: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood" | undefined;
         /** minItems 1 */
         venueSymbol?: string[] | undefined;
         /** minLength 1 */
         dex?: string | undefined;
-        network?: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
+        network?: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
         /** minLength 1 */
         address?: string | undefined;
         vendor?: "coingecko" | "coingecko-rwa" | "defillama" | undefined;
@@ -3752,20 +4695,54 @@ declare module "circuit:sdk" {
         cursor?: string | undefined;
         /** format "date-time" */
         asOf?: string | undefined;
-      } | undefined) => Promise<DataPage<"assets">> & AsyncIterable<{
+      } | undefined) => Promise<{
+        rows: readonly {
+          id: string;
+          symbol: string;
+          name: string;
+          assetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault";
+          underlyingAsset: string | null;
+          venueIdentifiers: {
+            venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
+            dex: string;
+            venueSymbol: string;
+            quoteAsset: string;
+            quoteSymbol: string;
+            delistedAt: string | null;
+          }[];
+          vendorIdentifiers: {
+            vendor: "coingecko" | "coingecko-rwa" | "defillama";
+            vendorKey: string;
+          }[];
+          categoryKeys: string[];
+          contracts: ({
+            network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
+            address: string;
+          } | {
+            network: "solana";
+            address: string;
+          } | {
+            network: "hypercore";
+            address: string;
+          } | {
+            network: string;
+            address: string;
+            error: string;
+          })[];
+        }[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
         id: string;
         symbol: string;
         name: string;
         assetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault";
         underlyingAsset: string | null;
         venueIdentifiers: {
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+          venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
           dex: string;
           venueSymbol: string;
           quoteAsset: string;
           quoteSymbol: string;
-          maximumLeverage: number | null;
-          orderSizeDecimals: number | null;
           delistedAt: string | null;
         }[];
         vendorIdentifiers: {
@@ -3788,33 +4765,6 @@ declare module "circuit:sdk" {
           error: string;
         })[];
       }>;
-      readonly candles: (params: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-        /** minItems 1 */
-        venueSymbol: string[];
-        /** minLength 1 */
-        dex?: string | undefined;
-        /** integer, exclusiveMinimum 0 */
-        lookbackMs?: number | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-        /** minLength 1 */
-        cursor?: string | undefined;
-        grain: "15m" | "1d" | "1h" | "1m" | "4h" | "5m";
-      }) => Promise<DataPage<"candles">> & AsyncIterable<{
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-        dex: string;
-        venueSymbol: string;
-        grain: "15m" | "1d" | "1h" | "1m" | "4h" | "5m";
-        timestampOpen: string;
-        tradeCount: number | null;
-        collectedFrom: "api" | "archive" | null;
-        close: string;
-        high: string;
-        low: string;
-        open: string;
-        volumeBase: string;
-      }>;
       readonly categories: (params?: {
         /** integer, exclusiveMinimum 0 */
         lookbackMs?: number | undefined;
@@ -3835,7 +4785,20 @@ declare module "circuit:sdk" {
         categoryKey?: undefined;
         /** minLength 2 */
         search?: string | undefined;
-      } | undefined) => Promise<DataPage<"categories">> & AsyncIterable<{
+      } | undefined) => Promise<{
+        rows: readonly {
+          denominationAsset: string;
+          denominationSymbol: string;
+          day: string;
+          firstObservedAt: string;
+          vendor: "coingecko" | "coingecko-rwa" | "defillama";
+          categoryKey: string;
+          name: string;
+          marketCap: string | null;
+          volume: string | null;
+        }[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
         denominationAsset: string;
         denominationSymbol: string;
         day: string;
@@ -3847,7 +4810,7 @@ declare module "circuit:sdk" {
         volume: string | null;
       }>;
       readonly fundingRates: (params: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         /** minItems 1 */
         venueSymbol: string[];
         /** minLength 1 */
@@ -3858,15 +4821,24 @@ declare module "circuit:sdk" {
         asOf?: string | undefined;
         /** minLength 1 */
         cursor?: string | undefined;
-      }) => Promise<DataPage<"funding_rates">> & AsyncIterable<{
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+      }) => Promise<{
+        rows: readonly {
+          venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
+          dex: string;
+          venueSymbol: string;
+          settlesAt: string;
+          fundingRate: string;
+        }[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         dex: string;
         venueSymbol: string;
         settlesAt: string;
         fundingRate: string;
       }>;
       readonly markets: (params: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         /** minLength 1 */
         dex?: string | undefined;
         order?: "asc" | "desc" | undefined;
@@ -3881,7 +4853,7 @@ declare module "circuit:sdk" {
         /** integer, exclusiveMinimum 0 */
         lookbackMs: number;
       } | {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         /** minLength 1 */
         dex?: string | undefined;
         order?: "asc" | "desc" | undefined;
@@ -3896,7 +4868,7 @@ declare module "circuit:sdk" {
         asOf?: string | undefined;
         sortBy?: "fundingRate" | "openInterestUsd" | "volumeUsd" | undefined;
       } | {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         /** minLength 1 */
         dex?: string | undefined;
         order?: undefined;
@@ -3911,14 +4883,14 @@ declare module "circuit:sdk" {
         sortBy?: undefined;
       }) => Promise<{
         rows: readonly {
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+          venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
           dex: string;
           venueSymbol: string;
           assetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault";
           underlyingAsset: string | null;
           underlyingAssetType: "bond" | "coin" | "commodity" | "etf" | "fiat" | "perpetual" | "prediction" | "stock" | "vault" | null;
           maximumLeverage: number | null;
-          orderSizeDecimals: number | null;
+          marginRule: "crossOrIsolated" | "isolatedOnly" | "strictIsolated" | null;
           fundingRate: string | null;
           settlesAt: string | null;
           observedDayCount: number | null;
@@ -3928,72 +4900,23 @@ declare module "circuit:sdk" {
           dayAgoPrice: string | null;
           medianDailyVolumeQuote: string | null;
           medianDailyVolumeUsd: string | null;
+          minimumNotional: string | null;
+          minimumSize: string | null;
           openInterestBase: string | null;
           openInterestQuote: string | null;
           openInterestUsd: string | null;
           price: string | null;
+          priceTick: string | null;
           priceUsd: string | null;
           quoteSymbol: string;
+          sizeStep: string | null;
           volumeQuote: string | null;
           volumeUsd: string | null;
         }[];
-      }>;
-      readonly marks: (params: {
-        /** integer, exclusiveMinimum 0 */
-        lookbackMs?: number | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
-        /** minLength 1 */
-        address: string;
-        /** minLength 1 */
-        tokenId?: string | undefined;
-      } | {
-        /** integer, exclusiveMinimum 0 */
-        lookbackMs?: number | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-        network: "solana";
-        /** minLength 1 */
-        address: string;
-        tokenId?: undefined;
-      } | {
-        /** integer, exclusiveMinimum 0 */
-        lookbackMs?: number | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-        network: "hypercore";
-        /** minLength 1 */
-        address: string;
-        tokenId?: undefined;
-      }) => Promise<{
-        rows: readonly {
-          network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-          address: string;
-          tokenId: string | null;
-          priceUsd: string;
-          pricedAt: string;
-        }[];
-      }>;
-      readonly mids: (params: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-        /** minItems 1 */
-        venueSymbol: string[];
-        /** minLength 1 */
-        dex?: string | undefined;
-        /** format "date-time" */
-        asOf?: string | undefined;
-      }) => Promise<{
-        rows: readonly {
-          venue: "hyperliquid" | "lighter" | "lighterRobinhood";
-          dex: string;
-          venueSymbol: string;
-          timestamp: string;
-          price: string;
-        }[];
+        nextCursor: string | null;
       }>;
       readonly openInterest: (params: {
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         /** minItems 1 */
         venueSymbol: string[];
         /** minLength 1 */
@@ -4004,8 +4927,17 @@ declare module "circuit:sdk" {
         asOf?: string | undefined;
         /** minLength 1 */
         cursor?: string | undefined;
-      }) => Promise<DataPage<"open_interest">> & AsyncIterable<{
-        venue: "hyperliquid" | "lighter" | "lighterRobinhood";
+      }) => Promise<{
+        rows: readonly {
+          venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
+          dex: string;
+          venueSymbol: string;
+          timestamp: string;
+          openInterestBase: string | null;
+        }[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
+        venue: "derive" | "hyperliquid" | "lighter" | "lighterRobinhood";
         dex: string;
         venueSymbol: string;
         timestamp: string;
@@ -4020,7 +4952,7 @@ declare module "circuit:sdk" {
         /** integer, minimum 1, maximum 100000 */
         limit?: number | undefined;
         /** minItems 1 */
-        network?: ("ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana")[] | undefined;
+        network?: ("derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana")[] | undefined;
         vendor?: "defillama" | "onchain" | undefined;
         /** minLength 1 */
         protocol?: string | undefined;
@@ -4072,7 +5004,7 @@ declare module "circuit:sdk" {
         rows: readonly {
           vendor: "defillama" | "onchain";
           pool: string;
-          network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+          network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
           protocol: string;
           factory: {
             network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
@@ -4163,6 +5095,32 @@ declare module "circuit:sdk" {
           volumeQuote: string | null;
           volumeUsd: string | null;
         }[];
+        nextCursor: string | null;
+      }>;
+      readonly prices: (params: {
+        /** minLength 1 */
+        network: string;
+        /** minLength 1 */
+        asset: string;
+        /** minLength 1 */
+        tokenId?: string | undefined;
+        interval: "15m" | "1d" | "1h" | "1m" | "4h" | "5m";
+        /** integer, minimum 1, maximum 5000 */
+        bars: number;
+        /** format "date-time" */
+        asOf?: string | undefined;
+      }) => Promise<{
+        price: string | null;
+        pricedAt: string | null;
+        historyStartsAt: string | null;
+        bars: readonly {
+          opensAt: string;
+          volume: string | null;
+          close: string;
+          high: string;
+          low: string;
+          open: string;
+        }[] | null;
       }>;
       readonly revenue: (params?: {
         /** integer, exclusiveMinimum 0 */
@@ -4189,7 +5147,31 @@ declare module "circuit:sdk" {
         /** minItems 1 */
         asset?: string[] | undefined;
         sortBy?: undefined;
-      } | undefined) => Promise<DataPage<"revenue">> & AsyncIterable<{
+      } | undefined) => Promise<{
+        rows: readonly ({
+          denominationAsset: string;
+          denominationSymbol: string;
+          day: string;
+          firstObservedAt: string;
+          asset: string;
+          vendor: "coingecko" | "coingecko-rwa" | "defillama";
+          contributingProtocols: string[];
+          fees: string | null;
+          holders: string | null;
+          total: string | null;
+        } | {
+          denominationAsset: string;
+          denominationSymbol: string;
+          asset: string;
+          vendor: "coingecko" | "coingecko-rwa" | "defillama";
+          symbol: string;
+          observedDayCount: number;
+          fees: string | null;
+          holders: string | null;
+          total: string | null;
+        })[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
         denominationAsset: string;
         denominationSymbol: string;
         day: string;
@@ -4236,7 +5218,7 @@ declare module "circuit:sdk" {
         })[] | undefined;
         /** minLength 1 */
         protocol?: string | undefined;
-        network?: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
+        network?: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
         vendor?: "defillama" | undefined;
         yieldKind?: "advertised" | "measured" | undefined;
         sortBy?: "apyExcludingRewards" | "apyIncludingRewards" | "totalValueLockedUsd" | undefined;
@@ -4271,7 +5253,7 @@ declare module "circuit:sdk" {
         })[] | undefined;
         /** minLength 1 */
         protocol?: string | undefined;
-        network?: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
+        network?: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana" | undefined;
         vendor?: "defillama" | undefined;
         yieldKind?: "advertised" | "measured" | undefined;
         sortBy?: undefined;
@@ -4282,12 +5264,58 @@ declare module "circuit:sdk" {
         impermanentLossRisk?: boolean | undefined;
         singleAssetExposure?: boolean | undefined;
         stablecoinOnly?: boolean | undefined;
-      } | undefined) => Promise<DataPage<"yields">> & AsyncIterable<{
+      } | undefined) => Promise<{
+        rows: readonly {
+          vendor: "defillama";
+          pool: string;
+          yieldKind: "advertised" | "measured";
+          protocol: string;
+          network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+          label: string;
+          depositToken: {
+            network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
+            address: string;
+          } | {
+            network: "solana";
+            address: string;
+          } | {
+            network: "hypercore";
+            address: string;
+          } | {
+            network: string;
+            address: string;
+            error: string;
+          } | null;
+          depositAsset: string | null;
+          constituents: {
+            address: string;
+            symbol: string | null;
+            decimals: number | null;
+            asset: string | null;
+          }[];
+          day: string;
+          firstObservedAt: string;
+          apyIncludingRewards: string | null;
+          denominationAddress: string | null;
+          denominationAsset: string | null;
+          withdrawalOutcome: "delayed" | "error_rpc" | "no_exit_primary" | "ok_full" | "ok_partial" | "reverted_liquidity" | "reverted_paused" | "reverted_unknown" | null;
+          withdrawalEtaMs: number | null;
+          measurementConfidence: "high" | "low" | "medium" | null;
+          apyExcludingRewards: string | null;
+          impermanentLossRisk: boolean;
+          singleAssetExposure: boolean;
+          stablecoinOnly: boolean;
+          totalValueLockedUsd: string | null;
+          withdrawableAmount: string | null;
+          withdrawalSlippagePercent: string | null;
+        }[];
+        nextCursor: string | null;
+      }> & AsyncIterable<{
         vendor: "defillama";
         pool: string;
         yieldKind: "advertised" | "measured";
         protocol: string;
-        network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
         label: string;
         depositToken: {
           network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999";
@@ -4395,21 +5423,124 @@ declare module "circuit:sdk" {
     }) => Promise<{
       sent: boolean;
     }>;
+    readonly operations: {
+      readonly cancel: (params: {
+        /** format "uuid" */
+        operationId: string;
+      }) => Promise<{
+        status: "error" | "pending" | "success" | "unproven";
+        operationId: string;
+        readError?: string | undefined;
+        kind: string;
+        request: unknown;
+        receipts: {
+          observationIndex: number | null;
+          position: string | null;
+          network: string;
+          referenceKind: string;
+          referenceValue: string;
+        }[];
+        createdAt: string;
+        deadlineAt: string | null;
+        error: unknown;
+        finishedAt: string | null;
+        result: unknown;
+      }>;
+      readonly list: (params?: {
+        cursor?: string | undefined;
+      } | undefined) => Promise<{
+        nextCursor: string | null;
+        rows: {
+          status: "error" | "pending" | "success" | "unproven";
+          operationId: string;
+          readError?: string | undefined;
+          kind: string;
+          request: unknown;
+          receipts: {
+            observationIndex: number | null;
+            position: string | null;
+            network: string;
+            referenceKind: string;
+            referenceValue: string;
+          }[];
+          createdAt: string;
+          action: ExecutableMoneyAction | null;
+          deadlineAt: string | null;
+          error: unknown;
+          finishedAt: string | null;
+          result: unknown;
+          sessionId: number | null;
+          walletId: number | null;
+        }[];
+      }> & AsyncIterable<{
+        status: "error" | "pending" | "success" | "unproven";
+        operationId: string;
+        readError?: string | undefined;
+        kind: string;
+        request: unknown;
+        receipts: {
+          observationIndex: number | null;
+          position: string | null;
+          network: string;
+          referenceKind: string;
+          referenceValue: string;
+        }[];
+        createdAt: string;
+        action: ExecutableMoneyAction | null;
+        deadlineAt: string | null;
+        error: unknown;
+        finishedAt: string | null;
+        result: unknown;
+        sessionId: number | null;
+        walletId: number | null;
+      }>;
+      readonly pending: () => Promise<{
+        status: "error" | "pending" | "success" | "unproven";
+        operationId: string;
+        readError?: string | undefined;
+        kind: string;
+        request: unknown;
+        receipts: {
+          observationIndex: number | null;
+          position: string | null;
+          network: string;
+          referenceKind: string;
+          referenceValue: string;
+        }[];
+        createdAt: string;
+        action: ExecutableMoneyAction | null;
+        deadlineAt: string | null;
+        error: unknown;
+        finishedAt: string | null;
+        result: unknown;
+        sessionId: number | null;
+        walletId: number | null;
+      }[]>;
+      readonly retrieve: (params: {
+        /** format "uuid" */
+        operationId: string;
+      }) => Promise<{
+        status: "error" | "pending" | "success" | "unproven";
+        operationId: string;
+        readError?: string | undefined;
+        kind: string;
+        request: unknown;
+        receipts: {
+          observationIndex: number | null;
+          position: string | null;
+          network: string;
+          referenceKind: string;
+          referenceValue: string;
+        }[];
+        createdAt: string;
+        action: ExecutableMoneyAction | null;
+        deadlineAt: string | null;
+        error: unknown;
+        finishedAt: string | null;
+        result: unknown;
+      }>;
+    };
     readonly solana: {
-      readonly candles: {
-        readonly list: (params: {
-          mint: string;
-          /** integer, minimum 1, maximum 100, default 10. Newest completed candles to return. */
-          limit?: number | undefined;
-        }) => Promise<{
-          openedAt: string;
-          close: string;
-          high: string;
-          low: string;
-          open: string;
-          volumeUsd: string;
-        }[]>;
-      };
       readonly holdings: {
         readonly retrieve: (params: {
           wallet: string;
@@ -4472,7 +5603,6 @@ declare module "circuit:sdk" {
       }) => Promise<null>;
     };
   };
-  export function getChainIdFromNetwork(network: `ethereum:${number}`): number;
   type MoneyActionOutcome = {
     status: "rejected";
   } | {
@@ -4487,59 +5617,937 @@ declare module "circuit:sdk" {
     readonly moneyFailure: NonNullable<ApiErrorDetails["moneyFailure"]>;
     readonly outcome: MoneyActionOutcome;
     readonly completedOperations: CompletedOperation[];
-    constructor(cause: unknown, outcome: MoneyActionOutcome, completedOperations: CompletedOperation[], stage: "admission" | "execution");
+    constructor(cause: unknown, outcome: MoneyActionOutcome, completedOperations: CompletedOperation[]);
   }
-  type SwapSide = {
-    network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+  type AgentRequest<Kind = string> = Extract<{
+    kind: "polymarketCancel";
+    orderId: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "polymarketRedeem";
+    scope: "market";
+    assets: [string];
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "polymarketPositionChange";
+    change: {
+      kind: "split";
+      asset: string;
+      amountPusd: string;
+    } | {
+      kind: "merge";
+      asset: string;
+      shares: string;
+    } | {
+      kind: "convert";
+      assets: string[];
+      shares: string;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "deriveVault";
+    vault: {
+      kind: "deposit";
+      vault: number;
+      amount: string;
+    } | {
+      kind: "withdraw";
+      vault: number;
+      shares: string;
+    } | {
+      kind: "cancel";
+      vault: number;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "papertradeClose";
+    positionIds: string[];
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "papertradeStake";
+    amount: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "papertradeUnstake";
+    amount: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "papertradeClaim";
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "krakenCancelOrder";
+    orderId: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "evmTx";
+    evm: {
+      chainId: number;
+      toAddress: string;
+      valueWei: string;
+      data: `0x${string}`;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "solanaTx";
+    solana: {
+      hexTransaction: `0x${string}`;
+    } | {
+      instructions: {
+        programAddress: string;
+        accounts: {
+          address: string;
+          isSigner: boolean;
+          isWritable: boolean;
+        }[];
+        data: ({
+          kind: "integer";
+          value: string;
+          bytes: 1 | 2 | 4 | 8 | 16;
+        } | {
+          kind: "address" | "anchor" | "hex" | "utf8";
+          value: string;
+        })[];
+      }[];
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "binanceCancelOrder";
+    orderId: string;
     asset: string;
-  };
-  type SwapParams = Omit<{
-    engines?: ("across" | "cowswap" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | undefined;
-    confidential?: boolean | undefined;
-    purpose?: "estimate" | "review" | undefined;
-    slippage?: string | undefined;
-    max?: boolean | undefined;
-    amount: string;
-    minimumReceive?: string | undefined;
-    from: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "bybitCancelOrder";
+    orderId: string;
+    asset: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "coinbaseCancelOrder";
+    orderId: string;
+    asset: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "deriveCancel";
+    orderId: unknown;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "hyperliquidCancel";
+    orderId: unknown;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterCancel";
+    orderId: unknown;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterRobinhoodCancel";
+    orderId: unknown;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "okxCancelOrder";
+    orderId: string;
+    asset: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "swap";
+    swap: {
+      from: {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      } | {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      };
+      to: {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      } | {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      } | {
+        stock: string;
+      };
+      minimumReceive?: string | null | undefined;
+      slippage?: string | null | undefined;
+      engines?: ("across" | "cowswap" | "derive" | "erc4626" | "hypercore" | "jupiter" | "kyberswap" | "lighter" | "metric" | "nearIntents" | "papertrade" | "pusd" | "relay" | "uniswap" | "velora" | "weth")[] | null | undefined;
+      confidential?: boolean | null | undefined;
+      amount: string | {
+        balancePercent: string;
+      };
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "transfer";
+    transfer: {
+      from: {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      } | {
+        network: "derive" | "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+        asset: string;
+      };
+      to: {
+        address: string;
+      };
+      amount: string | {
+        balancePercent: string;
+      };
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "hyperliquidOrder";
+    order: {
+      kind: "perpOpen";
+      message?: string | null | undefined;
+      leverage?: number | null | undefined;
+      marginMode?: "cross" | "isolated" | null | undefined;
       asset: string;
-      walletAddress: string;
+      side: "long" | "short";
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+      stopLoss?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
+      takeProfit?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
     } | {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      kind: "perpReduce";
+      message?: string | null | undefined;
       asset: string;
-      walletAddress: string;
-    };
-    to: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-      asset: string;
-      walletAddress: string;
+      expectedSide?: "long" | "short" | null | undefined;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
     } | {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      kind: "spotBuy";
+      message?: string | null | undefined;
       asset: string;
-      walletAddress: string;
-    };
-  }, "from" | "to"> & {
-    from: SwapSide;
-    to: SwapSide;
-  };
-  type TransferQuote = Omit<{
-    from: {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
-      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
     } | {
-      network: "ethereum:1" | "ethereum:10" | "ethereum:130" | "ethereum:137" | "ethereum:143" | "ethereum:146" | "ethereum:42161" | "ethereum:43114" | "ethereum:4663" | "ethereum:5042" | "ethereum:56" | "ethereum:57073" | "ethereum:59144" | "ethereum:747474" | "ethereum:8453" | "ethereum:9745" | "ethereum:999" | "hypercore" | "lighter" | "lighter-robinhood" | "papertrade" | "solana";
+      kind: "spotSell";
+      message?: string | null | undefined;
       asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
     };
-    to: {
-      address: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterOrder";
+    order: {
+      kind: "perpOpen";
+      message?: string | null | undefined;
+      leverage?: number | null | undefined;
+      marginMode?: "cross" | "isolated" | null | undefined;
+      asset: string;
+      side: "long" | "short";
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+      stopLoss?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
+      takeProfit?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
+    } | {
+      kind: "perpReduce";
+      message?: string | null | undefined;
+      asset: string;
+      expectedSide?: "long" | "short" | null | undefined;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+    } | {
+      kind: "spotBuy";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
     };
-    amount: string | {
-      balancePercent: string;
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterRobinhoodOrder";
+    order: {
+      kind: "perpOpen";
+      message?: string | null | undefined;
+      leverage?: number | null | undefined;
+      marginMode?: "cross" | "isolated" | null | undefined;
+      asset: string;
+      side: "long" | "short";
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+      stopLoss?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
+      takeProfit?: {
+        triggerPrice: string;
+        price?: string | null | undefined;
+      } | null | undefined;
+    } | {
+      kind: "perpReduce";
+      message?: string | null | undefined;
+      asset: string;
+      expectedSide?: "long" | "short" | null | undefined;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+    } | {
+      kind: "spotBuy";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
     };
-  }, "amount"> & {
-    amount: string;
-  };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "deriveOrder";
+    order: {
+      kind: "perpOpen";
+      message?: string | null | undefined;
+      asset: string;
+      side: "long" | "short";
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+    } | {
+      kind: "perpReduce";
+      message?: string | null | undefined;
+      asset: string;
+      expectedSide?: "long" | "short" | null | undefined;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | null | undefined;
+    } | {
+      kind: "spotBuy";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "optionBuy";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+      reduceOnly?: boolean | null | undefined;
+    } | {
+      kind: "optionSell";
+      message?: string | null | undefined;
+      asset: string;
+      amount: {
+        size: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+      reduceOnly?: boolean | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "polymarketOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+      } | null | undefined;
+    } | {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      };
+      execution: {
+        kind: "limit";
+        timeInForce: "alo" | "gtc" | "ioc";
+        price: string;
+        expiresAt?: string | null | undefined;
+      };
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      };
+      execution?: {
+        kind: "market";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      };
+      execution: {
+        kind: "limit";
+        timeInForce: "alo" | "gtc" | "ioc";
+        price: string;
+        expiresAt?: string | null | undefined;
+      };
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "papertradeOpen";
+    order: {
+      asset: string;
+      side: "long" | "short";
+      amount: {
+        value: string;
+      };
+      leverage: number;
+      fundFrom?: "balance" | "queued" | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "krakenPlaceOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+        expiresAt?: string | null | undefined;
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "stopLoss" | "takeProfit";
+        triggerPrice: string;
+      } | {
+        kind: "stopLossLimit" | "takeProfitLimit";
+        triggerPrice: string;
+        price: string;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+        expiresAt?: string | null | undefined;
+      } | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "coinbasePlaceOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "okxPlaceOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "binancePlaceOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "bybitPlaceOrder";
+    order: {
+      kind: "spotBuy";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    } | {
+      kind: "spotSell";
+      asset: string;
+      amount: {
+        size: string;
+      } | {
+        value: string;
+      };
+      execution?: {
+        kind: "market";
+        slippage?: string | null | undefined;
+      } | {
+        kind: "limit";
+        price: string;
+        timeInForce: "alo" | "gtc" | "ioc";
+      } | null | undefined;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "hyperliquidAccount";
+    account: {
+      kind: "isolatedMargin";
+      asset: string;
+      change: "add" | "remove";
+      amountUsdc: string;
+    } | {
+      kind: "staking";
+      change: "deposit" | "withdraw";
+      amount: string;
+    } | {
+      kind: "delegation";
+      change: "delegate" | "undelegate";
+      validator: `0x${string}`;
+      amount: string;
+    } | {
+      kind: "vault";
+      vault: `0x${string}`;
+      change: "deposit" | "withdraw";
+      amountUsdc: string;
+    } | {
+      kind: "scheduleCancel";
+      at: string | null;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterMargin";
+    margin: {
+      kind: "isolatedMargin";
+      asset: string;
+      change: "add" | "remove";
+      amountUsdc: string;
+    } | {
+      kind: "routeTransfer";
+      to: "perps" | "spot";
+      amountUsdc: string;
+    };
+  }, {
+    kind: Kind;
+  }> | Extract<{
+    kind: "lighterRobinhoodMargin";
+    margin: {
+      kind: "isolatedMargin";
+      asset: string;
+      change: "add" | "remove";
+      amountUsdc: string;
+    } | {
+      kind: "routeTransfer";
+      to: "perps" | "spot";
+      amountUsdc: string;
+    };
+  }, {
+    kind: Kind;
+  }>;
   type RunFunction = (agent: AgentContext) => Promise<void> | void;
-  export type { AgentContext, AgentSettings, ApiErrorDetails, CompletedOperation, EvmMoneyAction, EvmSignMessageRequest, Holding, KrakenCancelOrderResult, KrakenOrder, KrakenOrderBookData, KrakenSpotPair, KrakenTickerData, MoneyActionOutcome, MoneyOperationOptions, NetworkId, OperationResource, PolymarketDiscoverRail, PolymarketMarketLookup, PolymarketMarketOrderData, PolymarketOrderRequest, PolymarketPricePoint, PolymarketRedeemPositionsData, PolymarketRedeemRequest, PolymarketResolvedEvent, PolymarketSearchEventsData, RunFunction, SessionMovement, SignMessageData, SolanaMoneyAction, SwapProviderId, TransactionPreviewResponse, TransferQuoteResponse, TransferRequest, Trigger, VirtualAllocation, WalletTransactionRequest };
+  export type { AgentContext, AgentSettings, ApiErrorDetails, CompletedOperation, EvmMoneyAction, EvmSignMessageRequest, Holding, KrakenOrderBookData, KrakenSpotPair, KrakenTickerData, MoneyActionOutcome, NetworkId, Once, OperationResource, PolymarketDiscoverRail, PolymarketMarketLookup, PolymarketOrderProposal, PolymarketPricePoint, PolymarketRedeemPositionsData, PolymarketRedeemRequest, PolymarketResolvedEvent, PolymarketSearchEventsData, RunFunction, SessionMovement, SignMessageData, SolanaMoneyAction, SwapProviderId, SwapRequest, TransactionPreviewResponse, TransferQuoteResponse, TransferRequest, Trigger, VirtualAllocation, WalletTransactionRequest };
 }

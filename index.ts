@@ -77,12 +77,6 @@ export const run: RunFunction = async (agent) => {
   // Hyperliquid's maintenance margin is half the initial margin at maximum leverage.
   const maintenance = 1 / (2 * XYZ_MAX_LEVERAGE);
   const leverage = SHORT_LEVERAGE;
-  // A short opened under an earlier cap moves onto this one once per session; new shorts set it as they open.
-  const leverageKey = `leverage/${perp}/${leverage}`;
-  if (agent.allocation.holdings.some((holding) => holding.kind === "perp" && holding.asset === perp) && !(await agent.operations.retrieve({ idempotencyKey: leverageKey }))) {
-    await agent.hyperliquid.account.update({ kind: "leverage", asset: perp, leverage, marginMode: "cross" }, { idempotencyKey: leverageKey });
-    await agent.log(`Set the ${perp} short's leverage cap to ${leverage}x.`);
-  }
 
   const send = (to: `0x${string}`, data: `0x${string}`) =>
     agent.wallet.transactions.create({ network: BASE, request: { toAddress: to, valueWei: "0", data } });
@@ -95,7 +89,7 @@ export const run: RunFunction = async (agent) => {
 
   let statusHour = -1;
   for (;;) {
-    const pending = (await agent.operations.list({ pendingOnly: true })).rows.length;
+    const pending = (await agent.operations.pending()).length;
     if (pending > 0 && statusDue()) await agent.log(`Waiting for ${pending} pending operation${pending > 1 ? "s" : ""} to settle before the next step.`);
     const acted = pending > 0 ? false : await step();
     await agent.next({ until: Date.now() + (acted || pending > 0 ? BUSY_MS : IDLE_MS) });
@@ -257,8 +251,7 @@ export const run: RunFunction = async (agent) => {
     if (sharePriceUsd === null) throw new Error(`No ${ticker} price is available to size the ${perp} short.`);
     if (Math.abs(Number(gap)) * sharePriceUsd >= MIN_ORDER_USDC) {
       if (decimalCompare(gap, "0") > 0) {
-        await agent.hyperliquid.account.update({ kind: "leverage", asset: perp, leverage, marginMode: "cross" });
-        await agent.hyperliquid.orders.create({ kind: "perpOpen", asset: perp, side: "short", amount: { size: gap } });
+        await agent.hyperliquid.orders.create({ kind: "perpOpen", asset: perp, side: "short", leverage, marginMode: "cross", amount: { size: gap } });
         await agent.log(`Shorted ${gap} ${perp} to match ${supplied} ${ticker}c on Aave.`);
       } else {
         const excess = decimalMultiply(gap, "-1");
