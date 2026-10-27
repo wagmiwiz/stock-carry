@@ -28,7 +28,7 @@ Requires the [Circuit CLI](https://docs.circuit.org), a wallet holding at least 
 
 ```bash
 bun install
-circuit check
+circuit check   # also writes the editor types for `circuit:sdk`, which the CLI provides
 bun test
 
 # The agent is continuous: Circuit reads `continuous = true` from the uploaded agent, so upload after changing circuit.toml.

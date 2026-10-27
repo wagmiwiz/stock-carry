@@ -1,4 +1,7 @@
 node_modules/
+# Editor types for `circuit:sdk`, written by `circuit check`
+circuit-sdk.d.ts
+circuit-settings.d.ts
 .circuit/
 .claude/
 .env
