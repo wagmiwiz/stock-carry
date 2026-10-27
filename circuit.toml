@@ -1,0 +1,31 @@
+name = "STOCK CARRY"
+tagline = "Hedged Coinbase stocks on Aave"
+category = "yield"
+walletVmFamily = "evm"
+agentId = "fa42f76b-2745-43ff-b3fe-19c00a10cc77"
+continuous = true
+
+[startingAsset]
+network = "ethereum:8453"
+asset = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+# Smallest allocation whose rebalance at the default 10-point gap moves at least the 5 USDC bridge minimum (worst case: 65% collateral factor).
+minimumAmount = "127"
+
+[settings.stock]
+description = "The Coinbase stock token held on Aave and shorted on Hyperliquid. Change it only while the agent is out of the market for the weekend."
+type = "single_select"
+options = ["GOOGL", "NVDA", "META", "TSLA", "AAPL", "AMZN", "MSFT"]
+default = "GOOGL"
+
+[settings.position]
+description = "hold: stay hedged through weekends. exit_weekends: sell to USDC before the week's last US close, rebuild after the next open. close: sell to USDC now."
+type = "single_select"
+options = ["hold", "exit_weekends", "close"]
+default = "hold"
+
+[settings.rebalance_gap]
+description = "Move USDC between Aave and Hyperliquid once the stock's distance to liquidation on one side exceeds the other by this many percentage points."
+type = "percentage"
+default = 10
+min = 2
+max = 50
