@@ -251,12 +251,12 @@ export const run: RunFunction = async (agent) => {
     if (sharePriceUsd === null) throw new Error(`No ${ticker} price is available to size the ${perp} short.`);
     if (Math.abs(Number(gap)) * sharePriceUsd >= MIN_ORDER_USDC) {
       if (decimalCompare(gap, "0") > 0) {
-        await agent.hyperliquid.orders.create({ kind: "perpOpen", asset: perp, side: "short", leverage, marginMode: "cross", amount: { size: gap } });
-        await agent.log(`Shorted ${gap} ${perp} to match ${supplied} ${ticker}c on Aave.`);
+        const order = await agent.hyperliquid.orders.create({ kind: "perpOpen", asset: perp, side: "short", leverage, marginMode: "cross", amount: { size: gap } });
+        await agent.log(`Shorted ${order.result.filled} ${perp} to match ${supplied} ${ticker}c on Aave.`);
       } else {
         const excess = decimalMultiply(gap, "-1");
-        await agent.hyperliquid.orders.create({ kind: "perpReduce", asset: perp, expectedSide: "short", amount: { size: excess } });
-        await agent.log(`Bought back ${excess} ${perp} to match ${supplied} ${ticker}c on Aave.`);
+        const order = await agent.hyperliquid.orders.create({ kind: "perpReduce", asset: perp, expectedSide: "short", amount: { size: excess } });
+        await agent.log(`Bought back ${order.result.filled} ${perp} to match ${supplied} ${ticker}c on Aave.`);
       }
       return true;
     }
